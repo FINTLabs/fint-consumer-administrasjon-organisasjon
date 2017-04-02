@@ -73,8 +73,8 @@ public class OrganisasjonselementController {
     }
 
     @FintRelations
-    @RequestMapping(value = {"/organisasjonsId/{id}", "/organisasjonsid/{id}"}, method = RequestMethod.GET)
-    public ResponseEntity getOrganisasjonselement(@PathVariable String id,
+    @RequestMapping(value = {"/organisasjonsId/{id:.+}", "/organisasjonsid/{id:.+}"}, method = RequestMethod.GET)
+    public ResponseEntity getOrganisasjonselementOrgId(@PathVariable String id,
                                                   @RequestHeader(value = "x-org-id") String orgId,
                                                   @RequestHeader(value = "x-client") String client) {
         log.info("OrgId: {}", orgId);
@@ -107,6 +107,42 @@ public class OrganisasjonselementController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
 
+    @FintRelations
+    @RequestMapping(value = {"/organisasjonsKode/{kode}", "/organisasjonskode/{kode}"}, method = RequestMethod.GET)
+    public ResponseEntity getOrganisasjonselementOrgKode(@PathVariable String kode,
+                                                  @RequestHeader(value = "x-org-id") String orgId,
+                                                  @RequestHeader(value = "x-client") String client) {
+        log.info("OrgId: {}", orgId);
+        log.info("Client: {}", client);
+
+        Event event = new Event(orgId, "administrasjon/organisasjon", EventActions.GET_ORGANISASJONSELEMENT.name(), client);
+        fintAuditService.audit(event, true);
+
+        event.setStatus(Status.CACHE);
+        fintAuditService.audit(event, true);
+
+        String cacheUri = CacheUri.create(orgId, "organisasjonselement");
+        List<FintResource<Organisasjonselement>> organisasjonselements;
+
+        organisasjonselements = cacheService.getAll(cacheUri);
+
+        event.setStatus(Status.CACHE_RESPONSE);
+        fintAuditService.audit(event, true);
+
+        event.setStatus(Status.SENT_TO_CLIENT);
+        fintAuditService.audit(event, false);
+
+
+        Optional<FintResource<Organisasjonselement>> organisasjonselement = organisasjonselements.stream().filter(
+                org -> org.getConvertedResource().getOrganisasjonsKode().getIdentifikatorverdi().equals(kode)
+        ).findFirst();
+
+        if (organisasjonselement.isPresent()) {
+            return ResponseEntity.ok(organisasjonselement.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
