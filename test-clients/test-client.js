@@ -1,8 +1,8 @@
 const sleep = require('sleep')
 const amqp = require('amqplib')
 
-const health = require('./data/health.js')
-const relations = require('./data/relations.js')
+const health = require('./data/health')
+const organisasjonselement = require('./data/organisasjonselement')
 
 console.log('Usage: npm start <orgId>')
 sleep.sleep(20)
@@ -32,8 +32,8 @@ const consumeMsg = (channel) => {
         channel.publish('', msg.properties.replyTo, new Buffer(JSON.stringify(health)), { 'contentType': 'application/json' })
     } else {
         let replyMessage = {}
-        if (event.action === 'GET_RELATIONS') {
-            replyMessage = relations
+        if (event.action === 'GET_ALL_ORGANISASJONSELEMENT') {
+            replyMessage = organisasjonselement
         }
 
         replyMessage.corrId = event.corrId

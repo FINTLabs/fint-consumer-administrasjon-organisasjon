@@ -1,5 +1,5 @@
 buildscript {
-    apply from: 'https://raw.githubusercontent.com/FINTlibs/fint-buildscripts/v1.0.1/dependencies.gradle'
+    apply from: 'https://raw.githubusercontent.com/FINTlibs/fint-buildscripts/v1.0.2/dependencies.gradle'
     ext {
         springBootVersion = springBootVersion
     }
@@ -44,18 +44,21 @@ repositories {
 
 def modelVersions = [
         event: '0.0.11',
-        relation: '0.0.1'
+        relation: '0.0.20',
+        administrasjon: '1.0.0-rc.2.17'
 ]
 
 dependencies {
     compile("no.fint:fint-relation-model:${modelVersions['relation']}")
-    compile('no.fint:fint-relations:0.0.8')
-    compile('no.fint:fint-events:0.0.24')
+    compile("no.fint:fint-administrasjon-model-java:${modelVersions['administrasjon']}")
     compile("no.fint:fint-event-model:${modelVersions['event']}")
+
+    compile('no.fint:fint-relations:0.0.16')
+    compile('no.fint:fint-events:0.0.24')
     compile('no.fint:fint-audit-mongo-plugin:0.0.12')
     compile('no.fint:fint-cache:0.0.2')
-    compile('com.github.fakemongo:fongo:2.0.12')
 
+    compile('com.github.fakemongo:fongo:2.0.12')
     compile('org.projectlombok:lombok')
     compile("com.github.springfox.loader:springfox-loader:${springfoxLoaderVersion}")
     compile('io.github.benas:random-beans:3.3.0')

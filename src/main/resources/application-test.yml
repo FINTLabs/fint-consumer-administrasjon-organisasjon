@@ -6,6 +6,11 @@ fint:
   test-mode: true
 
  relations:
-   force-https: false
+  force-https: false
+
+ consumer:
+  cache:
+   initialDelay:
+    organisasjonselement: 1000
 
 link-mapper-base-url: http://localhost:8080
