@@ -6,6 +6,8 @@ import no.fint.consumer.event.Actions;
 import no.fint.consumer.organisasjonselement.OrganisasjonselementCacheService;
 import no.fint.consumer.utils.CacheUri;
 import no.fint.event.model.Event;
+import no.fint.events.annotations.FintEventListener;
+import no.fint.events.queue.QueueType;
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
 import no.fint.model.relation.FintResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ public class SubscriberService {
     @Autowired
     private OrganisasjonselementCacheService cacheService;
 
+    @FintEventListener(type = QueueType.UPSTREAM)
     public void recieve(Event event) {
         log.info("Event: {}", event.getAction());
         try {
