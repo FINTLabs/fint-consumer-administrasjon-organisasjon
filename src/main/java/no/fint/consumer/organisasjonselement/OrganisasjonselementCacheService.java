@@ -24,7 +24,7 @@ public class OrganisasjonselementCacheService extends CacheService<FintResource<
     @Autowired
     private ConsumerEventUtil consumerEventUtil;
 
-    @Value("${fint.events.orgsIds:mock.no}")
+    @Value("${fint.events.orgIds:mock.no}")
     private String[] orgs;
 
     @PostConstruct
