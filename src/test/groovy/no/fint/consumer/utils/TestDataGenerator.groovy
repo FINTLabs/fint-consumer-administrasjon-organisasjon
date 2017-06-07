@@ -18,14 +18,13 @@ class TestDataGenerator {
         Relation relation = new Relation.Builder()
                 .with(Personalressurs.Relasjonsnavn.PERSON)
                 .forType(Arbeidsforhold)
-                .path('/personalressurs')
                 .field('ansattnummer')
                 .value('10025').build()
 
         Identifikator identifikator = new Identifikator(identifikatorverdi: '12345')
         Organisasjonselement organisasjonselement = new Organisasjonselement(organisasjonsId: identifikator)
 
-        FintResource fintResource = FintResource.with(organisasjonselement)
+        FintResource fintResource = FintResource.with(organisasjonselement).addRelasjoner(relation)
 
         def json = objectMapper.writeValueAsString(fintResource)
 

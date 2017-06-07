@@ -7,14 +7,14 @@ import org.springframework.http.HttpHeaders
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
-class OrganizationControllerSpec extends MockMvcSpecification {
-    private OrganizationController controller
+class AdminControllerSpec extends MockMvcSpecification {
+    private AdminController controller
     private FintEvents fintEvents
     private MockMvc mockMvc
 
     void setup() {
         fintEvents = Mock(FintEvents)
-        controller = new OrganizationController(fintEvents: fintEvents)
+        controller = new AdminController(fintEvents: fintEvents)
         mockMvc = standaloneSetup(controller)
     }
 
