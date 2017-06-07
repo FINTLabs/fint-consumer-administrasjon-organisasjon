@@ -39,7 +39,7 @@ public class OrganisasjonselementCacheService extends CacheService<FintResource<
     @Scheduled(initialDelayString = "${fint.consumer.cache.initialDelay.organisasjonselement:40000}", fixedRateString = "${fint.consumer.cache.fixedRate.organisasjonselement:55000}")
     public void getAllPersons() {
         Arrays.stream(orgs).forEach(orgId -> {
-            log.info("Populating person cache for {}", orgId);
+            log.info("Populating organisasjonselement cache for {}", orgId);
             Event event = new Event(orgId, "administrasjon/organisasjon", Actions.GET_ALL_ORGANISASJONSELEMENT.name(), "CACHE_SERVICE");
             consumerEventUtil.send(event);
         });
