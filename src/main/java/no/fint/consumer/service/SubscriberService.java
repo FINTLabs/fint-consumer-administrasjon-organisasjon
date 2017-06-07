@@ -2,7 +2,7 @@ package no.fint.consumer.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import no.fint.consumer.event.EventActions;
+import no.fint.consumer.event.Actions;
 import no.fint.consumer.organisasjonselement.OrganisasjonselementCacheService;
 import no.fint.consumer.utils.CacheUri;
 import no.fint.event.model.Event;
@@ -28,9 +28,9 @@ public class SubscriberService {
     public void recieve(Event event) {
         log.info("Event: {}", event.getAction());
         try {
-            EventActions action = EventActions.valueOf(event.getAction());
+            Actions action = Actions.valueOf(event.getAction());
 
-            if (action == EventActions.GET_ALL_ORGANISASJONSELEMENT) {
+            if (action == Actions.GET_ALL_ORGANISASJONSELEMENT) {
                 List<?> organisasjonselements = event.getData();
                 List<FintResource> convertedList = organisasjonselements.stream().map(organisasjonselement -> objectMapper.convertValue(organisasjonselement, FintResource.class)).collect(Collectors.toList());
                 List<FintResource<Organisasjonselement>> organisasjonselementList = mapFintResource(Organisasjonselement.class, convertedList);

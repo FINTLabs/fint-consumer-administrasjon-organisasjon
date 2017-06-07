@@ -3,7 +3,7 @@ package no.fint.consumer.organisasjonselement;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.audit.FintAuditService;
-import no.fint.consumer.event.EventActions;
+import no.fint.consumer.event.Actions;
 import no.fint.consumer.utils.CacheUri;
 import no.fint.consumer.utils.RestEndpoints;
 import no.fint.event.model.Event;
@@ -49,7 +49,7 @@ public class OrganisasjonselementController {
         log.info("Client: {}", client);
         log.info("SinceTimeStamp: {}", sinceTimeStamp);
 
-        Event event = new Event(orgId, "administrasjon/organisasjon", EventActions.GET_ALL_ORGANISASJONSELEMENT.name(), client);
+        Event event = new Event(orgId, "administrasjon/organisasjon", Actions.GET_ALL_ORGANISASJONSELEMENT.name(), client);
         fintAuditService.audit(event, true);
 
         event.setStatus(Status.CACHE);
@@ -80,7 +80,7 @@ public class OrganisasjonselementController {
         log.info("OrgId: {}", orgId);
         log.info("Client: {}", client);
 
-        Event event = new Event(orgId, "administrasjon/organisasjon", EventActions.GET_ORGANISASJONSELEMENT.name(), client);
+        Event event = new Event(orgId, "administrasjon/organisasjon", Actions.GET_ORGANISASJONSELEMENT.name(), client);
         fintAuditService.audit(event, true);
 
         event.setStatus(Status.CACHE);
@@ -117,7 +117,7 @@ public class OrganisasjonselementController {
         log.info("OrgId: {}", orgId);
         log.info("Client: {}", client);
 
-        Event event = new Event(orgId, "administrasjon/organisasjon", EventActions.GET_ORGANISASJONSELEMENT.name(), client);
+        Event event = new Event(orgId, "administrasjon/organisasjon", Actions.GET_ORGANISASJONSELEMENT.name(), client);
         fintAuditService.audit(event, true);
 
         event.setStatus(Status.CACHE);
