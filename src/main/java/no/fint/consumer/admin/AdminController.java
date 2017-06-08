@@ -36,8 +36,8 @@ public class AdminController {
     private FintEvents fintEvents;
 
     @GetMapping("/health")
-    public ResponseEntity healthCheck(@RequestHeader(value = Constants.HEADER_ORGID) String orgId,
-                                      @RequestHeader(value = Constants.HEADER_CLIENT) String client) {
+    public ResponseEntity healthCheck(@RequestHeader(value = Constants.HEADER_ORGID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId,
+                                      @RequestHeader(value = Constants.HEADER_CLIENT, defaultValue = Constants.DEFAULT_HEADER_CLIENT) String client) {
         Event<Health> event = new Event<>(orgId, "administrasjon/organisasjon", DefaultActions.HEALTH.name(), client);
         Optional<Event<Health>> health = consumerEventUtil.healthCheck(event);
 

@@ -3,6 +3,7 @@ package no.fint.consumer.organisasjonselement;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.audit.FintAuditService;
+import no.fint.consumer.Constants;
 import no.fint.consumer.event.Actions;
 import no.fint.consumer.utils.CacheUri;
 import no.fint.consumer.utils.RestEndpoints;
@@ -35,15 +36,15 @@ public class OrganisasjonselementController {
     private OrganisasjonselementCacheService cacheService;
 
     @RequestMapping(value = "/last-updated", method = RequestMethod.GET)
-    public Map<String, String> getLastUpdated(@RequestHeader(value = "x-org-id") String orgId) {
+    public Map<String, String> getLastUpdated(@RequestHeader(value = Constants.HEADER_ORGID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId) {
         String lastUpdated = Long.toString(cacheService.getLastUpdated(CacheUri.create(orgId, "organisasjonselement")));
         return ImmutableMap.of("lastUpdated", lastUpdated);
     }
 
     @FintRelations
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity getOrganisasjonselementer(@RequestHeader(value = "x-org-id") String orgId,
-                                                    @RequestHeader(value = "x-client") String client,
+    public ResponseEntity getOrganisasjonselementer(@RequestHeader(value = Constants.HEADER_ORGID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId,
+                                                    @RequestHeader(value = Constants.HEADER_CLIENT, defaultValue = Constants.DEFAULT_HEADER_CLIENT) String client,
                                                     @RequestParam(required = false) Long sinceTimeStamp) {
         log.info("OrgId: {}", orgId);
         log.info("Client: {}", client);
@@ -75,8 +76,8 @@ public class OrganisasjonselementController {
     @FintRelations
     @RequestMapping(value = {"/organisasjonsId/{id:.+}", "/organisasjonsid/{id:.+}"}, method = RequestMethod.GET)
     public ResponseEntity getOrganisasjonselementOrgId(@PathVariable String id,
-                                                  @RequestHeader(value = "x-org-id") String orgId,
-                                                  @RequestHeader(value = "x-client") String client) {
+                                                       @RequestHeader(value = Constants.HEADER_ORGID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId,
+                                                       @RequestHeader(value = Constants.HEADER_CLIENT, defaultValue = Constants.DEFAULT_HEADER_CLIENT) String client) {
         log.info("OrgId: {}", orgId);
         log.info("Client: {}", client);
 
@@ -112,8 +113,8 @@ public class OrganisasjonselementController {
     @FintRelations
     @RequestMapping(value = {"/organisasjonsKode/{kode}", "/organisasjonskode/{kode}"}, method = RequestMethod.GET)
     public ResponseEntity getOrganisasjonselementOrgKode(@PathVariable String kode,
-                                                  @RequestHeader(value = "x-org-id") String orgId,
-                                                  @RequestHeader(value = "x-client") String client) {
+                                                         @RequestHeader(value = Constants.HEADER_ORGID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId,
+                                                         @RequestHeader(value = Constants.HEADER_CLIENT, defaultValue = Constants.DEFAULT_HEADER_CLIENT) String client) {
         log.info("OrgId: {}", orgId);
         log.info("Client: {}", client);
 
