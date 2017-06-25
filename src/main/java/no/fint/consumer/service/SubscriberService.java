@@ -2,12 +2,12 @@ package no.fint.consumer.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import no.fint.consumer.event.Actions;
+import no.fint.cache.utils.CacheUri;
 import no.fint.consumer.organisasjonselement.OrganisasjonselementCacheService;
-import no.fint.consumer.utils.CacheUri;
 import no.fint.event.model.Event;
 import no.fint.events.annotations.FintEventListener;
 import no.fint.events.queue.QueueType;
+import no.fint.model.administrasjon.organisasjon.OrganisasjonActions;
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
 import no.fint.model.relation.FintResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +31,13 @@ public class SubscriberService {
     public void recieve(Event event) {
         log.info("Event: {}", event.getAction());
         try {
-            Actions action = Actions.valueOf(event.getAction());
+            OrganisasjonActions action = OrganisasjonActions.valueOf(event.getAction());
 
-            if (action == Actions.GET_ALL_ORGANISASJONSELEMENT) {
+            if (action == OrganisasjonActions.GET_ALL_ORGANISASJONSELEMENT) {
                 List<?> organisasjonselements = event.getData();
                 List<FintResource> convertedList = organisasjonselements.stream().map(organisasjonselement -> objectMapper.convertValue(organisasjonselement, FintResource.class)).collect(Collectors.toList());
                 List<FintResource<Organisasjonselement>> organisasjonselementList = mapFintResource(Organisasjonselement.class, convertedList);
-                cacheService.getCache(CacheUri.create(event.getOrgId(), "organisasjonselement")).ifPresent(cache -> cache.update(organisasjonselementList));
+                cacheService.getCache(CacheUri.create(event.getOrgId(), OrganisasjonselementCacheService.MODEL)).ifPresent(cache -> cache.update(organisasjonselementList));
             } else {
                 log.warn("Unhandled event: {}", event.getAction());
             }
