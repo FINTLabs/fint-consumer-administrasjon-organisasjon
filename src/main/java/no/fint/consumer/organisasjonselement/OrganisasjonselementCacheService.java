@@ -1,16 +1,17 @@
 package no.fint.consumer.organisasjonselement;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.cache.CacheService;
 import no.fint.cache.FintCache;
-import no.fint.consumer.CacheService;
-import no.fint.consumer.event.Actions;
+import no.fint.cache.utils.CacheUri;
+import no.fint.consumer.config.Constants;
+import no.fint.consumer.config.ConsumerProps;
 import no.fint.consumer.event.ConsumerEventUtil;
-import no.fint.consumer.utils.CacheUri;
 import no.fint.event.model.Event;
+import no.fint.model.administrasjon.organisasjon.OrganisasjonActions;
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
 import no.fint.model.relation.FintResource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -21,26 +22,28 @@ import java.util.Arrays;
 @Service
 public class OrganisasjonselementCacheService extends CacheService<FintResource<Organisasjonselement>> {
 
+    public static final String MODEL = Organisasjonselement.class.getSimpleName().toLowerCase();
+
     @Autowired
     private ConsumerEventUtil consumerEventUtil;
 
-    @Value("${fint.events.orgIds:mock.no}")
-    private String[] orgs;
+    @Autowired
+    private ConsumerProps props;
 
     @PostConstruct
     public void init() {
-        Arrays.stream(orgs).forEach(orgId -> {
+        Arrays.stream(props.getOrgs()).forEach(orgId -> {
             FintCache<FintResource<Organisasjonselement>> cache = new FintCache<>();
-            String cacheUri = CacheUri.create(orgId, "organisasjonselement");
-            caches.put(cacheUri, cache);
+            String cacheUri = CacheUri.create(orgId, MODEL);
+            put(cacheUri, cache);
         });
     }
 
-    @Scheduled(initialDelayString = "${fint.consumer.cache.initialDelay.organisasjonselement:40000}", fixedRateString = "${fint.consumer.cache.fixedRate.organisasjonselement:55000}")
+    @Scheduled(initialDelayString = ConsumerProps.CACHE_INITIALDELAY_ORGANISASJONSELEMENT, fixedRateString = ConsumerProps.CACHE_FIXEDRATE_ORGANISASJONSELEMENT)
     public void getAllPersons() {
-        Arrays.stream(orgs).forEach(orgId -> {
+        Arrays.stream(props.getOrgs()).forEach(orgId -> {
             log.info("Populating organisasjonselement cache for {}", orgId);
-            Event event = new Event(orgId, "administrasjon/organisasjon", Actions.GET_ALL_ORGANISASJONSELEMENT.name(), "CACHE_SERVICE");
+            Event event = new Event(orgId, Constants.COMPONENT, OrganisasjonActions.GET_ALL_ORGANISASJONSELEMENT, Constants.CACHE_SERVICE);
             consumerEventUtil.send(event);
         });
     }
