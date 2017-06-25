@@ -40,7 +40,7 @@ public class AdminController {
     @GetMapping("/health")
     public ResponseEntity healthCheck(@RequestHeader(value = HeaderConstants.ORG_ID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId,
                                       @RequestHeader(value = HeaderConstants.CLIENT, defaultValue = Constants.DEFAULT_HEADER_CLIENT) String client) {
-        Event<Health> event = new Event<>(orgId, Constants.COMPONENT, DefaultActions.HEALTH.name(), client);
+        Event<Health> event = new Event<>(orgId, Constants.COMPONENT, DefaultActions.HEALTH, client);
         event.addData(new Health(Constants.COMPONENT_CONSUMER, HealthStatus.SENT_FROM_CONSUMER_TO_PROVIDER));
         Optional<Event<Health>> health = consumerEventUtil.healthCheck(event);
 
@@ -59,7 +59,7 @@ public class AdminController {
         if (orgIds.containsKey(orgId)) {
             return ResponseEntity.badRequest().body(String.format("OrgId %s is already registered", orgId));
         } else {
-            Event event = new Event(orgId, "administrasjon/personal", DefaultActions.REGISTER_ORG_ID.name(), "consumer");
+            Event event = new Event(orgId, Constants.COMPONENT, DefaultActions.REGISTER_ORG_ID, Constants.COMPONENT_CONSUMER);
             fintEvents.sendDownstream("system", event);
 
             fintEvents.registerUpstreamListener(SubscriberService.class, orgId);
