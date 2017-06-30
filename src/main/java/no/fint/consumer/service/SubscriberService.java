@@ -2,7 +2,6 @@ package no.fint.consumer.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import no.fint.cache.utils.CacheUri;
 import no.fint.consumer.organisasjonselement.OrganisasjonselementCacheService;
 import no.fint.event.model.Event;
 import no.fint.events.annotations.FintEventListener;
@@ -37,7 +36,7 @@ public class SubscriberService {
                 List<?> organisasjonselements = event.getData();
                 List<FintResource> convertedList = organisasjonselements.stream().map(organisasjonselement -> objectMapper.convertValue(organisasjonselement, FintResource.class)).collect(Collectors.toList());
                 List<FintResource<Organisasjonselement>> organisasjonselementList = mapFintResource(Organisasjonselement.class, convertedList);
-                cacheService.getCache(CacheUri.create(event.getOrgId(), OrganisasjonselementCacheService.MODEL)).ifPresent(cache -> cache.update(organisasjonselementList));
+                cacheService.getCache(event.getOrgId()).ifPresent(cache -> cache.update(organisasjonselementList));
             } else {
                 log.warn("Unhandled event: {}", event.getAction());
             }
