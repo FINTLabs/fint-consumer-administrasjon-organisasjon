@@ -3,7 +3,6 @@ package no.fint.consumer.organisasjonselement;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.audit.FintAuditService;
-import no.fint.cache.utils.CacheUri;
 import no.fint.consumer.config.Constants;
 import no.fint.consumer.utils.RestEndpoints;
 import no.fint.event.model.Event;
@@ -38,7 +37,7 @@ public class OrganisasjonselementController {
 
     @RequestMapping(value = "/last-updated", method = RequestMethod.GET)
     public Map<String, String> getLastUpdated(@RequestHeader(value = HeaderConstants.ORG_ID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId) {
-        String lastUpdated = Long.toString(cacheService.getLastUpdated(CacheUri.create(orgId, OrganisasjonselementCacheService.MODEL)));
+        String lastUpdated = Long.toString(cacheService.getLastUpdated(orgId));
         return ImmutableMap.of("lastUpdated", lastUpdated);
     }
 
@@ -57,12 +56,11 @@ public class OrganisasjonselementController {
         event.setStatus(Status.CACHE);
         fintAuditService.audit(event);
 
-        String cacheUri = CacheUri.create(orgId, OrganisasjonselementCacheService.MODEL);
         List<FintResource<Organisasjonselement>> organisasjonselements;
         if (sinceTimeStamp == null) {
-            organisasjonselements = cacheService.getAll(cacheUri);
+            organisasjonselements = cacheService.getAll(orgId);
         } else {
-            organisasjonselements = cacheService.getAll(cacheUri, sinceTimeStamp);
+            organisasjonselements = cacheService.getAll(orgId, sinceTimeStamp);
         }
 
         event.setStatus(Status.CACHE_RESPONSE);
@@ -88,10 +86,7 @@ public class OrganisasjonselementController {
         event.setStatus(Status.CACHE);
         fintAuditService.audit(event);
 
-        String cacheUri = CacheUri.create(orgId, OrganisasjonselementCacheService.MODEL);
-        List<FintResource<Organisasjonselement>> organisasjonselements;
-
-        organisasjonselements = cacheService.getAll(cacheUri);
+        List<FintResource<Organisasjonselement>> organisasjonselements = cacheService.getAll(orgId);
 
         event.setStatus(Status.CACHE_RESPONSE);
         fintAuditService.audit(event);
@@ -125,10 +120,7 @@ public class OrganisasjonselementController {
         event.setStatus(Status.CACHE);
         fintAuditService.audit(event);
 
-        String cacheUri = CacheUri.create(orgId, OrganisasjonselementCacheService.MODEL);
-        List<FintResource<Organisasjonselement>> organisasjonselements;
-
-        organisasjonselements = cacheService.getAll(cacheUri);
+        List<FintResource<Organisasjonselement>> organisasjonselements = cacheService.getAll(orgId);
 
         event.setStatus(Status.CACHE_RESPONSE);
         fintAuditService.audit(event);

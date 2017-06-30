@@ -2,6 +2,8 @@ package no.fint.consumer.admin;
 
 import lombok.AccessLevel;
 import lombok.Setter;
+import no.fint.cache.CacheService;
+import no.fint.cache.utils.CacheUri;
 import no.fint.consumer.config.Constants;
 import no.fint.consumer.event.ConsumerEventUtil;
 import no.fint.consumer.service.SubscriberService;
@@ -19,9 +21,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController
@@ -31,8 +36,8 @@ public class AdminController {
     @Autowired
     private ConsumerEventUtil consumerEventUtil;
 
-    @Setter(AccessLevel.PACKAGE)
-    private Map<String, Long> orgIds = new ConcurrentHashMap<>();
+    @Autowired
+    private List<CacheService> cacheServices = Collections.emptyList();
 
     @Autowired
     private FintEvents fintEvents;
@@ -54,16 +59,27 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/organization/orgIds/{orgId}")
+    @GetMapping("/organisations")
+    public List<String> getOrganisations() {
+        return CacheUri.getCacheUris(cacheServices);
+    }
+
+    @GetMapping("/organisations/{orgId:.+}")
+    public List<String> getOrganization(@PathVariable String orgId) {
+        List<String> cacheUris = CacheUri.getCacheUris(cacheServices);
+        return cacheUris.stream().filter(key -> CacheUri.containsOrgId(key, orgId)).collect(Collectors.toList());
+    }
+
+    @PostMapping("/organisations/{orgId:.+}")
     public ResponseEntity registerOrganization(@PathVariable String orgId) {
-        if (orgIds.containsKey(orgId)) {
+        if (CacheUri.containsOrgId(cacheServices, orgId)) {
             return ResponseEntity.badRequest().body(String.format("OrgId %s is already registered", orgId));
         } else {
-            Event event = new Event(orgId, Constants.COMPONENT, DefaultActions.REGISTER_ORG_ID, Constants.COMPONENT_CONSUMER);
+            Event event = new Event(orgId, Constants.COMPONENT, DefaultActions.REGISTER_ORG_ID.name(), "consumer");
             fintEvents.sendDownstream("system", event);
 
+            cacheServices.forEach(cache -> cache.createCache(orgId));
             fintEvents.registerUpstreamListener(SubscriberService.class, orgId);
-            orgIds.put(orgId, System.currentTimeMillis());
 
             URI location = ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand().toUri();
             return ResponseEntity.created(location).build();
