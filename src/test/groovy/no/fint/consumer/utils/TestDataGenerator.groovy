@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement
 import no.fint.model.administrasjon.personal.Arbeidsforhold
 import no.fint.model.administrasjon.personal.Personalressurs
-import no.fint.model.felles.Identifikator
+import no.fint.model.felles.kompleksedatatyper.Identifikator
 import no.fint.model.relation.FintResource
 import no.fint.model.relation.Relation
 
