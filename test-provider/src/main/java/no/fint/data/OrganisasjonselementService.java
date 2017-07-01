@@ -2,7 +2,7 @@ package no.fint.data;
 
 import com.google.common.collect.ImmutableList;
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
-import no.fint.model.felles.Identifikator;
+import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.relation.FintResource;
 import org.springframework.stereotype.Service;
 
