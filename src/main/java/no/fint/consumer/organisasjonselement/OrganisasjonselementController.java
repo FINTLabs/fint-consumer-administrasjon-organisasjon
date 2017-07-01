@@ -94,7 +94,6 @@ public class OrganisasjonselementController {
         event.setStatus(Status.SENT_TO_CLIENT);
         fintAuditService.audit(event);
 
-
         Optional<FintResource<Organisasjonselement>> organisasjonselement = organisasjonselements.stream().filter(
                 org -> org.getConvertedResource().getOrganisasjonsId().getIdentifikatorverdi().equals(id)
         ).findFirst();
@@ -127,7 +126,6 @@ public class OrganisasjonselementController {
 
         event.setStatus(Status.SENT_TO_CLIENT);
         fintAuditService.audit(event);
-
 
         Optional<FintResource<Organisasjonselement>> organisasjonselement = organisasjonselements.stream().filter(
                 org -> org.getConvertedResource().getOrganisasjonsKode().getIdentifikatorverdi().equals(kode)
