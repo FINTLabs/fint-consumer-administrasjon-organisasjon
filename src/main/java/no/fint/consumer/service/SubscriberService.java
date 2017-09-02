@@ -24,11 +24,10 @@ public class SubscriberService {
 
     @FintEventListener(type = QueueType.UPSTREAM)
     public void recieve(Event event) {
-        log.info("Event: {}", event.getAction());
+        log.debug("Received event: {}", event);
         try {
-            OrganisasjonActions action = OrganisasjonActions.valueOf(event.getAction());
-
-            if (action == OrganisasjonActions.GET_ALL_ORGANISASJONSELEMENT) {
+            String action = event.getAction();
+            if (action.equals(OrganisasjonActions.GET_ALL_ORGANISASJONSELEMENT.name())) {
                 List<FintResource<Organisasjonselement>> organisasjonselementList = EventUtil.convertEventData(event, new TypeReference<List<FintResource<Organisasjonselement>>>() {
                 });
                 cacheService.getCache(event.getOrgId()).ifPresent(cache -> cache.update(organisasjonselementList));

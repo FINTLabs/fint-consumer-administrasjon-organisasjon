@@ -15,8 +15,12 @@ public class OrganisasjonselementService {
         Identifikator organisasjonsId = new Identifikator();
         organisasjonsId.setIdentifikatorverdi("12345");
 
+        Identifikator organisasjonsKode = new Identifikator();
+        organisasjonsKode.setIdentifikatorverdi("abc");
+
         Organisasjonselement organisasjonselement = new Organisasjonselement();
         organisasjonselement.setOrganisasjonsId(organisasjonsId);
+        organisasjonselement.setOrganisasjonsKode(organisasjonsKode);
 
         FintResource<Organisasjonselement> fintResource = FintResource.with(organisasjonselement);
         return ImmutableList.of(fintResource);

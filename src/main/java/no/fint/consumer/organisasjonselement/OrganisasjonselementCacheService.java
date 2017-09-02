@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -42,11 +43,26 @@ public class OrganisasjonselementCacheService extends CacheService<FintResource<
     }
 
     @Scheduled(initialDelayString = ConsumerProps.CACHE_INITIALDELAY_ORGANISASJONSELEMENT, fixedRateString = ConsumerProps.CACHE_FIXEDRATE_ORGANISASJONSELEMENT)
-    public void getAllPersons() {
-        Arrays.stream(props.getOrgs()).forEach(orgId -> {
-            log.info("Populating organisasjonselement cache for {}", orgId);
-            Event event = new Event(orgId, Constants.COMPONENT, OrganisasjonActions.GET_ALL_ORGANISASJONSELEMENT, Constants.CACHE_SERVICE);
-            consumerEventUtil.send(event);
-        });
+    public void populateCacheAll() {
+        Arrays.stream(props.getOrgs()).forEach(this::populateCache);
+    }
+
+    public void rebuildCache(String orgId) {
+        flush(orgId);
+        populateCache(orgId);
+    }
+
+    private void populateCache(String orgId) {
+        log.info("Populating organisasjonselement cache for {}", orgId);
+        Event event = new Event(orgId, Constants.COMPONENT, OrganisasjonActions.GET_ALL_ORGANISASJONSELEMENT, Constants.CACHE_SERVICE);
+        consumerEventUtil.send(event);
+    }
+
+    public Optional<FintResource<Organisasjonselement>> getOrganisasjonselementById(String orgId, String organisasjonsId) {
+        return getOne(orgId, (fintResource) -> fintResource.getResource().getOrganisasjonsId().getIdentifikatorverdi().equals(organisasjonsId));
+    }
+
+    public Optional<FintResource<Organisasjonselement>> getOrganisasjonselementByKode(String orgId, String kode) {
+        return getOne(orgId, (fintResource) -> fintResource.getResource().getOrganisasjonsKode().getIdentifikatorverdi().equals(kode));
     }
 }
