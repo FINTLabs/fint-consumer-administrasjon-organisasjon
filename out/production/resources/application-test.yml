@@ -1,0 +1,18 @@
+fint:
+ events:
+  test-mode: true
+  queue-endpoint-enabled: true
+  orgIds: 'pwf.no'
+
+ audit:
+  test-mode: true
+
+ relations:
+  force-https: false
+
+ consumer:
+  cache:
+   initialDelay:
+    organisasjonselement: 1000
+
+link-mapper-base-url: http://localhost:8080

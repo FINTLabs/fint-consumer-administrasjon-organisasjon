@@ -11,8 +11,7 @@ import no.fint.event.model.Status;
 import no.fint.model.administrasjon.organisasjon.OrganisasjonActions;
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
 import no.fint.model.relation.FintResource;
-import no.fint.relations.annotations.FintRelations;
-import no.fint.relations.annotations.FintSelf;
+import no.fint.relations.FintRelationsMediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,11 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@FintSelf(type = Organisasjonselement.class, property = "organisasjonsId")
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping(value = RestEndpoints.ORGANISASJONSELEMENT, produces = {"application/hal+json", MediaType.APPLICATION_JSON_UTF8_VALUE})
+@RequestMapping(value = RestEndpoints.ORGANISASJONSELEMENT, produces = {FintRelationsMediaType.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
 public class OrganisasjonselementController {
 
     @Autowired
@@ -35,14 +33,26 @@ public class OrganisasjonselementController {
     @Autowired
     private OrganisasjonselementCacheService cacheService;
 
-    @RequestMapping(value = "/last-updated", method = RequestMethod.GET)
+    @Autowired
+    private OrganisasjonselementAssembler assembler;
+
+    @GetMapping("/last-updated")
     public Map<String, String> getLastUpdated(@RequestHeader(value = HeaderConstants.ORG_ID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId) {
         String lastUpdated = Long.toString(cacheService.getLastUpdated(orgId));
         return ImmutableMap.of("lastUpdated", lastUpdated);
     }
 
-    @FintRelations
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping("/cache/size")
+    public ImmutableMap<String, Integer> getCacheSize(@RequestHeader(value = HeaderConstants.ORG_ID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId) {
+        return ImmutableMap.of("size", cacheService.getAll(orgId).size());
+    }
+
+    @PostMapping("/cache/refresh")
+    public void rebuildCache(@RequestHeader(value = HeaderConstants.ORG_ID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId) {
+        cacheService.rebuildCache(orgId);
+    }
+
+    @GetMapping
     public ResponseEntity getOrganisasjonselementer(@RequestHeader(value = HeaderConstants.ORG_ID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId,
                                                     @RequestHeader(value = HeaderConstants.CLIENT, defaultValue = Constants.DEFAULT_HEADER_CLIENT) String client,
                                                     @RequestParam(required = false) Long sinceTimeStamp) {
@@ -53,8 +63,7 @@ public class OrganisasjonselementController {
         Event event = new Event(orgId, Constants.COMPONENT, OrganisasjonActions.GET_ALL_ORGANISASJONSELEMENT, client);
         fintAuditService.audit(event);
 
-        event.setStatus(Status.CACHE);
-        fintAuditService.audit(event);
+        fintAuditService.audit(event, Status.CACHE);
 
         List<FintResource<Organisasjonselement>> organisasjonselements;
         if (sinceTimeStamp == null) {
@@ -63,50 +72,36 @@ public class OrganisasjonselementController {
             organisasjonselements = cacheService.getAll(orgId, sinceTimeStamp);
         }
 
-        event.setStatus(Status.CACHE_RESPONSE);
-        fintAuditService.audit(event);
+        fintAuditService.audit(event, Status.CACHE_RESPONSE, Status.SENT_TO_CLIENT);
 
-        event.setStatus(Status.SENT_TO_CLIENT);
-        fintAuditService.audit(event);
-
-        return ResponseEntity.ok(organisasjonselements);
+        return assembler.resources(organisasjonselements);
     }
 
-    @FintRelations
-    @RequestMapping(value = {"/organisasjonsId/{id:.+}", "/organisasjonsid/{id:.+}"}, method = RequestMethod.GET)
+    @GetMapping("/organisasjonsId/{id:.+}")
     public ResponseEntity getOrganisasjonselementOrgId(@PathVariable String id,
                                                        @RequestHeader(value = HeaderConstants.ORG_ID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId,
                                                        @RequestHeader(value = HeaderConstants.CLIENT, defaultValue = Constants.DEFAULT_HEADER_CLIENT) String client) {
+        log.info("Id: {}", id);
         log.info("OrgId: {}", orgId);
         log.info("Client: {}", client);
 
         Event event = new Event(orgId, Constants.COMPONENT, OrganisasjonActions.GET_ORGANISASJONSELEMENT, client);
         fintAuditService.audit(event);
 
-        event.setStatus(Status.CACHE);
-        fintAuditService.audit(event);
+        fintAuditService.audit(event, Status.CACHE);
 
-        List<FintResource<Organisasjonselement>> organisasjonselements = cacheService.getAll(orgId);
+        Optional<FintResource<Organisasjonselement>> organisasjonselement = cacheService.getOrganisasjonselementById(orgId, id);
 
-        event.setStatus(Status.CACHE_RESPONSE);
-        fintAuditService.audit(event);
-
-        event.setStatus(Status.SENT_TO_CLIENT);
-        fintAuditService.audit(event);
-
-        Optional<FintResource<Organisasjonselement>> organisasjonselement = organisasjonselements.stream().filter(
-                org -> org.getConvertedResource().getOrganisasjonsId().getIdentifikatorverdi().equals(id)
-        ).findFirst();
+        fintAuditService.audit(event, Status.CACHE_RESPONSE, Status.SENT_TO_CLIENT);
 
         if (organisasjonselement.isPresent()) {
-            return ResponseEntity.ok(organisasjonselement.get());
+            return assembler.resource(organisasjonselement.get());
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @FintRelations
-    @RequestMapping(value = {"/organisasjonsKode/{kode}", "/organisasjonskode/{kode}"}, method = RequestMethod.GET)
+    @GetMapping("/organisasjonsKode/{kode}")
     public ResponseEntity getOrganisasjonselementOrgKode(@PathVariable String kode,
                                                          @RequestHeader(value = HeaderConstants.ORG_ID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId,
                                                          @RequestHeader(value = HeaderConstants.CLIENT, defaultValue = Constants.DEFAULT_HEADER_CLIENT) String client) {
@@ -116,23 +111,14 @@ public class OrganisasjonselementController {
         Event event = new Event(orgId, Constants.COMPONENT, OrganisasjonActions.GET_ORGANISASJONSELEMENT, client);
         fintAuditService.audit(event);
 
-        event.setStatus(Status.CACHE);
-        fintAuditService.audit(event);
+        fintAuditService.audit(event, Status.CACHE);
 
-        List<FintResource<Organisasjonselement>> organisasjonselements = cacheService.getAll(orgId);
+        Optional<FintResource<Organisasjonselement>> organisasjonselement = cacheService.getOrganisasjonselementByKode(orgId, kode);
 
-        event.setStatus(Status.CACHE_RESPONSE);
-        fintAuditService.audit(event);
-
-        event.setStatus(Status.SENT_TO_CLIENT);
-        fintAuditService.audit(event);
-
-        Optional<FintResource<Organisasjonselement>> organisasjonselement = organisasjonselements.stream().filter(
-                org -> org.getConvertedResource().getOrganisasjonsKode().getIdentifikatorverdi().equals(kode)
-        ).findFirst();
+        fintAuditService.audit(event, Status.CACHE_RESPONSE, Status.SENT_TO_CLIENT);
 
         if (organisasjonselement.isPresent()) {
-            return ResponseEntity.ok(organisasjonselement.get());
+            return assembler.resource(organisasjonselement.get());
         } else {
             return ResponseEntity.notFound().build();
         }
