@@ -1,5 +1,6 @@
 package no.fint.consumer.organisasjonselement;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.cache.CacheService;
 import no.fint.cache.FintCache;
@@ -7,6 +8,7 @@ import no.fint.consumer.config.Constants;
 import no.fint.consumer.config.ConsumerProps;
 import no.fint.consumer.event.ConsumerEventUtil;
 import no.fint.event.model.Event;
+import no.fint.event.model.EventUtil;
 import no.fint.model.administrasjon.organisasjon.OrganisasjonActions;
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
 import no.fint.model.relation.FintResource;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -31,7 +34,7 @@ public class OrganisasjonselementCacheService extends CacheService<FintResource<
     private ConsumerProps props;
 
     public OrganisasjonselementCacheService() {
-        super(MODEL);
+        super(MODEL, OrganisasjonActions.GET_ALL_ORGANISASJONSELEMENT);
     }
 
     @PostConstruct
@@ -64,5 +67,12 @@ public class OrganisasjonselementCacheService extends CacheService<FintResource<
 
     public Optional<FintResource<Organisasjonselement>> getOrganisasjonselementByKode(String orgId, String kode) {
         return getOne(orgId, (fintResource) -> fintResource.getResource().getOrganisasjonsKode().getIdentifikatorverdi().equals(kode));
+    }
+
+    @Override
+    public void onAction(Event event) {
+        List<FintResource<Organisasjonselement>> resources = EventUtil.convertEventData(event, new TypeReference<List<FintResource<Organisasjonselement>>>() {
+        });
+        getCache(event.getOrgId()).ifPresent(cache -> cache.update(resources));
     }
 }
