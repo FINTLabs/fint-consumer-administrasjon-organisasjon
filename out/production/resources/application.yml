@@ -1,6 +1,0 @@
-fint:
- version: '@version@'
-
-local:
- server:
-  port: 8080
