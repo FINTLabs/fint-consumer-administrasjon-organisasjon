@@ -8,7 +8,6 @@ import no.fint.consumer.config.Constants;
 import no.fint.consumer.config.ConsumerProps;
 import no.fint.consumer.event.ConsumerEventUtil;
 import no.fint.event.model.Event;
-import no.fint.event.model.EventUtil;
 import no.fint.model.administrasjon.organisasjon.OrganisasjonActions;
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
 import no.fint.model.relation.FintResource;
@@ -71,8 +70,7 @@ public class OrganisasjonselementCacheService extends CacheService<FintResource<
 
     @Override
     public void onAction(Event event) {
-        List<FintResource<Organisasjonselement>> resources = EventUtil.convertEventData(event, new TypeReference<List<FintResource<Organisasjonselement>>>() {
+        update(event, new TypeReference<List<FintResource<Organisasjonselement>>>() {
         });
-        getCache(event.getOrgId()).ifPresent(cache -> cache.update(resources));
     }
 }
