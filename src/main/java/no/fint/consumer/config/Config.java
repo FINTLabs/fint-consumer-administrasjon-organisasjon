@@ -34,7 +34,7 @@ public class Config {
     public Map<String, String> linkMapper() {
         return ImmutableMap.of(
                 Organisasjonselement.class.getName(), fullPath(RestEndpoints.ORGANISASJONSELEMENT),
-                Personalressurs.class.getName(), "/administrasjon/personal/personalressurs/ansattnummer"
+                Personalressurs.class.getName(), "/administrasjon/personal/personalressurs"
         );
     }
 
