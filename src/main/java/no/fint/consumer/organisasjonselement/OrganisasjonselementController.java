@@ -105,6 +105,7 @@ public class OrganisasjonselementController {
     public ResponseEntity getOrganisasjonselementOrgKode(@PathVariable String kode,
                                                          @RequestHeader(value = HeaderConstants.ORG_ID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId,
                                                          @RequestHeader(value = HeaderConstants.CLIENT, defaultValue = Constants.DEFAULT_HEADER_CLIENT) String client) {
+        log.info("Kode: {}", kode);
         log.info("OrgId: {}", orgId);
         log.info("Client: {}", client);
 
@@ -114,6 +115,30 @@ public class OrganisasjonselementController {
         fintAuditService.audit(event, Status.CACHE);
 
         Optional<FintResource<Organisasjonselement>> organisasjonselement = cacheService.getOrganisasjonselementByKode(orgId, kode);
+
+        fintAuditService.audit(event, Status.CACHE_RESPONSE, Status.SENT_TO_CLIENT);
+
+        if (organisasjonselement.isPresent()) {
+            return assembler.resource(organisasjonselement.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/organisasjonsnummer/{kode}")
+    public ResponseEntity getOrganisasjonselementNummer(@PathVariable String kode,
+                                                        @RequestHeader(value = HeaderConstants.ORG_ID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId,
+                                                        @RequestHeader(value = HeaderConstants.CLIENT, defaultValue = Constants.DEFAULT_HEADER_CLIENT) String client) {
+        log.info("Kode: {}", kode);
+        log.info("OrgId: {}", orgId);
+        log.info("Client: {}", client);
+
+        Event event = new Event(orgId, Constants.COMPONENT, OrganisasjonActions.GET_ORGANISASJONSELEMENT, client);
+        fintAuditService.audit(event);
+
+        fintAuditService.audit(event, Status.CACHE);
+
+        Optional<FintResource<Organisasjonselement>> organisasjonselement = cacheService.getOrganisasjonselementByNummer(orgId, kode);
 
         fintAuditService.audit(event, Status.CACHE_RESPONSE, Status.SENT_TO_CLIENT);
 

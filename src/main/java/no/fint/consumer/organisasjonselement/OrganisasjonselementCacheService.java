@@ -38,10 +38,7 @@ public class OrganisasjonselementCacheService extends CacheService<FintResource<
 
     @PostConstruct
     public void init() {
-        Arrays.stream(props.getOrgs()).forEach(orgId -> {
-            FintCache<FintResource<Organisasjonselement>> cache = new FintCache<>();
-            put(orgId, cache);
-        });
+        Arrays.stream(props.getOrgs()).forEach(this::createCache);
     }
 
     @Scheduled(initialDelayString = ConsumerProps.CACHE_INITIALDELAY_ORGANISASJONSELEMENT, fixedRateString = ConsumerProps.CACHE_FIXEDRATE_ORGANISASJONSELEMENT)
@@ -68,9 +65,13 @@ public class OrganisasjonselementCacheService extends CacheService<FintResource<
         return getOne(orgId, (fintResource) -> fintResource.getResource().getOrganisasjonsKode().getIdentifikatorverdi().equals(kode));
     }
 
-    @Override
-    public void onAction(Event event) {
-        update(event, new TypeReference<List<FintResource<Organisasjonselement>>>() {
-        });
-    }
+	public Optional<FintResource<Organisasjonselement>> getOrganisasjonselementByNummer(String orgNummer, String kode) {
+        return getOne(orgNummer, (fintResource) -> fintResource.getResource().getOrganisasjonsnummer().getIdentifikatorverdi().equals(kode));
+	}
+	
+	@Override
+	public void onAction(Event event) {
+		update(event, new TypeReference<List<FintResource<Organisasjonselement>>>() {
+		});
+	}
 }
