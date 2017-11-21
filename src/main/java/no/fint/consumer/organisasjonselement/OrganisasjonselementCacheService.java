@@ -65,8 +65,8 @@ public class OrganisasjonselementCacheService extends CacheService<FintResource<
         return getOne(orgId, (fintResource) -> fintResource.getResource().getOrganisasjonsKode().getIdentifikatorverdi().equals(kode));
     }
 
-	public Optional<FintResource<Organisasjonselement>> getOrganisasjonselementByNummer(String orgNummer, String kode) {
-        return getOne(orgNummer, (fintResource) -> fintResource.getResource().getOrganisasjonsnummer().getIdentifikatorverdi().equals(kode));
+	public Optional<FintResource<Organisasjonselement>> getOrganisasjonselementByNummer(String orgId, String nummer) {
+        return getOne(orgId, (fintResource) -> fintResource.getResource().getOrganisasjonsnummer().getIdentifikatorverdi().equals(nummer));
 	}
 	
 	@Override

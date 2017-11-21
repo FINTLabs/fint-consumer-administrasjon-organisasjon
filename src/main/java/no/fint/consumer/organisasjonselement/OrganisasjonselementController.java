@@ -125,11 +125,11 @@ public class OrganisasjonselementController {
         }
     }
 
-    @GetMapping("/organisasjonsnummer/{kode}")
-    public ResponseEntity getOrganisasjonselementNummer(@PathVariable String kode,
+    @GetMapping("/organisasjonsnummer/{nummer}")
+    public ResponseEntity getOrganisasjonselementNummer(@PathVariable String nummer,
                                                         @RequestHeader(value = HeaderConstants.ORG_ID, defaultValue = Constants.DEFAULT_HEADER_ORGID) String orgId,
                                                         @RequestHeader(value = HeaderConstants.CLIENT, defaultValue = Constants.DEFAULT_HEADER_CLIENT) String client) {
-        log.info("Kode: {}", kode);
+        log.info("Nummer: {}", nummer);
         log.info("OrgId: {}", orgId);
         log.info("Client: {}", client);
 
@@ -138,7 +138,7 @@ public class OrganisasjonselementController {
 
         fintAuditService.audit(event, Status.CACHE);
 
-        Optional<FintResource<Organisasjonselement>> organisasjonselement = cacheService.getOrganisasjonselementByNummer(orgId, kode);
+        Optional<FintResource<Organisasjonselement>> organisasjonselement = cacheService.getOrganisasjonselementByNummer(orgId, nummer);
 
         fintAuditService.audit(event, Status.CACHE_RESPONSE, Status.SENT_TO_CLIENT);
 
