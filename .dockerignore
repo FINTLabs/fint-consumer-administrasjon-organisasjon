@@ -1,0 +1,8 @@
+.gradle
+.idea
+build
+classes
+out
+.DS_Store
+*.iml
+test-provider/node_modules/
