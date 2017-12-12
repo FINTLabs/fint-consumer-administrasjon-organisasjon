@@ -10,6 +10,7 @@ import no.fint.consumer.event.ConsumerEventUtil;
 import no.fint.event.model.Event;
 import no.fint.model.administrasjon.organisasjon.OrganisasjonActions;
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
+import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.relation.FintResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -66,7 +67,9 @@ public class OrganisasjonselementCacheService extends CacheService<FintResource<
     }
 
 	public Optional<FintResource<Organisasjonselement>> getOrganisasjonselementByNummer(String orgId, String nummer) {
-        return getOne(orgId, (fintResource) -> fintResource.getResource().getOrganisasjonsnummer().getIdentifikatorverdi().equals(nummer));
+        Identifikator id = new Identifikator();
+        id.setIdentifikatorverdi(nummer);
+        return getOne(orgId, (fintResource) -> id.equals(fintResource.getResource().getOrganisasjonsnummer()));
 	}
 	
 	@Override
