@@ -1,8 +1,6 @@
 package no.fint.consumer.config;
 
 import no.fint.audit.FintAuditService;
-import no.fint.cache.CacheManager;
-import no.fint.cache.FintCacheManager;
 import no.fint.consumer.event.ConsumerEventUtil;
 import no.fint.events.FintEvents;
 import no.fint.events.FintEventsHealth;
@@ -10,8 +8,6 @@ import no.fint.events.config.FintEventsProps;
 import no.fint.events.config.RedissonConfig;
 import no.fint.events.queue.FintEventsQueue;
 import no.fint.events.scheduling.FintEventsScheduling;
-import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
-import no.fint.model.relation.FintResource;
 import org.springframework.context.annotation.Bean;
 import spock.mock.DetachedMockFactory;
 import spock.mock.MockFactory;
@@ -23,11 +19,6 @@ public class FintTestConfiguration {
     @Bean
     ConsumerProps consumerProps() {
         return new ConsumerProps();
-    }
-
-    @Bean
-    CacheManager<FintResource<Organisasjonselement>> cacheManager() {
-        return new FintCacheManager<>();
     }
 
     // TODO: Possible to avoid declaring all of these??
@@ -71,6 +62,5 @@ public class FintTestConfiguration {
     ConsumerEventUtil consumerEventUtil() {
         return mockFactory.Mock(ConsumerEventUtil.class);
     }
-
 
 }
