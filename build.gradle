@@ -52,12 +52,12 @@ dependencies {
     compile('no.fint:fint-model-core:0.0.2-1')
     compile("no.fint:fint-relation-model:1.1.0-2")
     compile("no.fint:fint-administrasjon-model-java:${apiVersion}")
-    compile("no.fint:fint-event-model:2.0.0")
+    compile("no.fint:fint-event-model:2.0.1")
 
-    compile('no.fint:fint-relations:1.2.0-1')
-    compile('no.fint:fint-events:1.0.1')
+    compile('no.fint:fint-relations:1.2.0-2')
+    compile('no.fint:fint-events:2.0.1')
     compile('no.fint:fint-audit-mongo-plugin:1.1.1')
-    compile('no.fint:fint-cache:1.4.0')
+    compile('no.fint:fint-cache:2.0.1-beta-1')
 
     compile('org.projectlombok:lombok')
     compile("com.github.springfox.loader:springfox-loader:${springfoxLoaderVersion}")
