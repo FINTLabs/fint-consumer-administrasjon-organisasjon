@@ -7,11 +7,22 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class ConsumerProps {
+    
+    @Value("${fint.consumer.override-org-id:false}")
+    private boolean overrideOrgId;
 
-    public static final String CACHE_INITIALDELAY_ORGANISASJONSELEMENT = "${fint.consumer.cache.initialDelay.organisasjonselement:40000}";
-    public static final String CACHE_FIXEDRATE_ORGANISASJONSELEMENT = "${fint.consumer.cache.fixedRate.organisasjonselement:900000}";
+    @Value("${fint.consumer.default-client:FINT}")
+    private String defaultClient;
 
-    @Value("${fint.events.orgIds:mock.no}")
+    @Value("${fint.consumer.default-org-id:fint.no}")
+    private String defaultOrgId;
+    
+    @Value("${fint.events.orgIds:fint.no}")
     private String[] orgs;
+
+    
+    public static final String CACHE_INITIALDELAY_ORGANISASJONSELEMENT = "${fint.consumer.cache.initialDelay.organisasjonselement:60000}";
+    public static final String CACHE_FIXEDRATE_ORGANISASJONSELEMENT = "${fint.consumer.cache.fixedRate.organisasjonselement:900000}";
+    
 
 }
