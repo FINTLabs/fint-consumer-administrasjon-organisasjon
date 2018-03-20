@@ -1,6 +1,7 @@
 package no.fint.consumer.organisasjonselement
 
 import no.fint.consumer.config.FintTestConfiguration
+import no.fint.consumer.models.organisasjonselement.OrganisasjonselementCacheService
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement
 import no.fint.model.felles.kompleksedatatyper.Identifikator
 import no.fint.model.relation.FintResource
@@ -27,7 +28,7 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
                 organisasjonsnavn: "TEST AS"))])
 
         when:
-        def result = cacheService.getOrganisasjonselementByNummer("mock.no", "123456789")
+        def result = cacheService.getOrganisasjonselementByOrganisasjonsnummer("mock.no", "123456789")
 
         then:
         result
@@ -43,7 +44,7 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
                 organisasjonsnavn: "TEST AS"))])
 
         when:
-        def result = cacheService.getOrganisasjonselementByNummer("mock.no", "123456789")
+        def result = cacheService.getOrganisasjonselementByOrganisasjonsnummer("mock.no", "123456789")
 
         then:
         result
@@ -59,7 +60,7 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
                 organisasjonsnavn: "TEST AS"))])
 
         when:
-        def result = cacheService.getOrganisasjonselementById("mock.no", "12345")
+        def result = cacheService.getOrganisasjonselementByOrganisasjonsId("mock.no", "12345")
 
         then:
         result
@@ -76,7 +77,7 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
                 organisasjonsnavn: "TEST AS"))])
 
         when:
-        def result = cacheService.getOrganisasjonselementByKode("mock.no", "ABCD")
+        def result = cacheService.getOrganisasjonselementByOrganisasjonsKode("mock.no", "ABCD")
 
         then:
         result
@@ -86,7 +87,7 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
 
     def "Organisation Not Created"() {
         when:
-        def result = cacheService.getOrganisasjonselementByNummer("mock.no", "123456789")
+        def result = cacheService.getOrganisasjonselementByOrganisasjonsnummer("mock.no", "123456789")
 
         then:
         result
@@ -102,7 +103,7 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
                 organisasjonsnavn: "TEST AS"))])
 
         when:
-        def result = cacheService.getOrganisasjonselementByKode("mock.no", "XYZZY")
+        def result = cacheService.getOrganisasjonselementByOrganisasjonsKode("mock.no", "XYZZY")
 
         then:
         result
@@ -118,7 +119,7 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
                 organisasjonsnavn: "TEST AS"))])
 
         when:
-        def result = cacheService.getOrganisasjonselementById("mock.no", "33333")
+        def result = cacheService.getOrganisasjonselementByOrganisasjonsId("mock.no", "33333")
 
         then:
         result
@@ -134,7 +135,7 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
                 organisasjonsnavn: "TEST AS"))])
 
         when:
-        def result = cacheService.getOrganisasjonselementByNummer("mock.no", "987654321")
+        def result = cacheService.getOrganisasjonselementByOrganisasjonsnummer("mock.no", "987654321")
 
         then:
         result
@@ -150,7 +151,7 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
                 organisasjonsnavn: "TEST AS"))])
 
         when:
-        def result = cacheService.getOrganisasjonselementByNummer("fake.no", "123456789")
+        def result = cacheService.getOrganisasjonselementByOrganisasjonsnummer("fake.no", "123456789")
 
         then:
         result

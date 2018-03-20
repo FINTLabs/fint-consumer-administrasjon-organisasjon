@@ -1,6 +1,10 @@
 package no.fint.consumer.organisasjonselement
 
 import no.fint.audit.FintAuditService
+import no.fint.consumer.config.ConsumerProps
+import no.fint.consumer.models.organisasjonselement.OrganisasjonselementAssembler
+import no.fint.consumer.models.organisasjonselement.OrganisasjonselementCacheService
+import no.fint.consumer.models.organisasjonselement.OrganisasjonselementController
 import no.fint.consumer.utils.RestEndpoints
 import no.fint.event.model.HeaderConstants
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement
@@ -15,6 +19,7 @@ class OrganisasjonselementControllerSpec extends MockMvcSpecification {
     private OrganisasjonselementCacheService cacheService
     private OrganisasjonselementAssembler assembler
     private MockMvc mockMvc
+    private ConsumerProps props
 
     void setup() {
         cacheService = Mock(OrganisasjonselementCacheService)
@@ -22,7 +27,8 @@ class OrganisasjonselementControllerSpec extends MockMvcSpecification {
             resource(_) >> ResponseEntity.ok().build()
             resources(_) >> ResponseEntity.ok().build()
         }
-        controller = new OrganisasjonselementController(cacheService: cacheService, assembler: assembler, fintAuditService: Mock(FintAuditService))
+        props = new ConsumerProps(overrideOrgId: false, defaultClient: "TEST", defaultOrgId: "mock.no")
+        controller = new OrganisasjonselementController(cacheService: cacheService, assembler: assembler, fintAuditService: Mock(FintAuditService), props: props)
         mockMvc = standaloneSetup(controller)
     }
 
@@ -49,27 +55,39 @@ class OrganisasjonselementControllerSpec extends MockMvcSpecification {
         response.andExpect(status().isOk())
     }
 
-    def "GET organisasjonselement by organisasjonsId"() {
+    def "GET organisasjonselement by organisasjonsid"() {
         when:
-        def response = mockMvc.perform(get("${RestEndpoints.ORGANISASJONSELEMENT}/organisasjonsId/123")
+        def response = mockMvc.perform(get("${RestEndpoints.ORGANISASJONSELEMENT}/organisasjonsid/123")
                 .header(HeaderConstants.ORG_ID, 'rogfk.no')
                 .header(HeaderConstants.CLIENT, 'test')
         )
 
         then:
-        1 * cacheService.getOrganisasjonselementById('rogfk.no', '123') >> [FintResource.with(new Organisasjonselement(organisasjonsId: new Identifikator(identifikatorverdi: '123')))]
+        1 * cacheService.getOrganisasjonselementByOrganisasjonsId('rogfk.no', '123') >> [FintResource.with(new Organisasjonselement(organisasjonsId: new Identifikator(identifikatorverdi: '123')))]
         response.andExpect(status().isOk())
     }
 
-    def "GET organisasjonselement by organisasjonsKode"() {
+    def "GET organisasjonselement by organisasjonskode"() {
         when:
-        def response = mockMvc.perform(get("${RestEndpoints.ORGANISASJONSELEMENT}/organisasjonsKode/abc")
+        def response = mockMvc.perform(get("${RestEndpoints.ORGANISASJONSELEMENT}/organisasjonskode/abc")
                 .header(HeaderConstants.ORG_ID, 'rogfk.no')
                 .header(HeaderConstants.CLIENT, 'test')
         )
 
         then:
-        1 * cacheService.getOrganisasjonselementByKode('rogfk.no', 'abc') >> [FintResource.with(new Organisasjonselement(organisasjonsKode: new Identifikator(identifikatorverdi: 'abc')))]
+        1 * cacheService.getOrganisasjonselementByOrganisasjonsKode('rogfk.no', 'abc') >> [FintResource.with(new Organisasjonselement(organisasjonsKode: new Identifikator(identifikatorverdi: 'abc')))]
+        response.andExpect(status().isOk())
+    }
+
+    def "GET organisasjonselement by organisasjonsnummer"() {
+        when:
+        def response = mockMvc.perform(get("${RestEndpoints.ORGANISASJONSELEMENT}/organisasjonsnummer/123456789")
+                .header(HeaderConstants.ORG_ID, 'rogfk.no')
+                .header(HeaderConstants.CLIENT, 'test')
+        )
+
+        then:
+        1 * cacheService.getOrganisasjonselementByOrganisasjonsnummer('rogfk.no', '123456789') >> [FintResource.with(new Organisasjonselement(organisasjonsKode: new Identifikator(identifikatorverdi: 'abc')))]
         response.andExpect(status().isOk())
     }
 }
