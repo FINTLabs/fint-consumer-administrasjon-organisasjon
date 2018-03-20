@@ -54,7 +54,7 @@ services:
      window: 120s
 
   health-adapter:
-     image: dtr.rogfk.no/fint-beta/health-adapter
+     image: dtr.rogfk.no/fint-beta/health-adapter:1.1.0
      #ports:
      #  - "8402:8080"
      environment:
