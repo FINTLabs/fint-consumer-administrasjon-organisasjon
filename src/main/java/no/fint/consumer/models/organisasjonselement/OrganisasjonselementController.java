@@ -27,7 +27,7 @@ import no.fint.model.administrasjon.organisasjon.OrganisasjonActions;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping(value = RestEndpoints.ORGANISASJONSELEMENT, produces = {FintRelationsMediaType.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
+@RequestMapping(name = "Organisasjonselement", value = RestEndpoints.ORGANISASJONSELEMENT, produces = {FintRelationsMediaType.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
 public class OrganisasjonselementController {
 
     @Autowired
