@@ -2,14 +2,15 @@ package no.fint.consumer.organisasjonselement
 
 import no.fint.audit.FintAuditService
 import no.fint.consumer.config.ConsumerProps
-import no.fint.consumer.models.organisasjonselement.OrganisasjonselementAssembler
 import no.fint.consumer.models.organisasjonselement.OrganisasjonselementCacheService
 import no.fint.consumer.models.organisasjonselement.OrganisasjonselementController
+import no.fint.consumer.models.organisasjonselement.OrganisasjonselementLinker
 import no.fint.consumer.utils.RestEndpoints
 import no.fint.event.model.HeaderConstants
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement
 import no.fint.model.felles.kompleksedatatyper.Identifikator
 import no.fint.model.relation.FintResource
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
 import no.fint.test.utils.MockMvcSpecification
 import org.springframework.http.ResponseEntity
 import org.springframework.test.web.servlet.MockMvc
@@ -17,18 +18,17 @@ import org.springframework.test.web.servlet.MockMvc
 class OrganisasjonselementControllerSpec extends MockMvcSpecification {
     private OrganisasjonselementController controller
     private OrganisasjonselementCacheService cacheService
-    private OrganisasjonselementAssembler assembler
+    private OrganisasjonselementLinker linker
     private MockMvc mockMvc
     private ConsumerProps props
 
     void setup() {
         cacheService = Mock(OrganisasjonselementCacheService)
-        assembler = Mock(OrganisasjonselementAssembler) {
-            resource(_) >> ResponseEntity.ok().build()
-            resources(_) >> ResponseEntity.ok().build()
+        linker = Mock(OrganisasjonselementLinker) {
+            toResource(_) >> { args -> args[0] }
         }
         props = new ConsumerProps(overrideOrgId: false, defaultClient: "TEST", defaultOrgId: "mock.no")
-        controller = new OrganisasjonselementController(cacheService: cacheService, assembler: assembler, fintAuditService: Mock(FintAuditService), props: props)
+        controller = new OrganisasjonselementController(cacheService: cacheService, linker: linker, fintAuditService: Mock(FintAuditService), props: props)
         mockMvc = standaloneSetup(controller)
     }
 
@@ -51,7 +51,7 @@ class OrganisasjonselementControllerSpec extends MockMvcSpecification {
         )
 
         then:
-        1 * cacheService.getAll('rogfk.no') >> [FintResource.with(new Organisasjonselement()), FintResource.with(new Organisasjonselement())]
+        1 * cacheService.getAll('rogfk.no') >> [new OrganisasjonselementResource(), new OrganisasjonselementResource()]
         response.andExpect(status().isOk())
     }
 
@@ -63,7 +63,7 @@ class OrganisasjonselementControllerSpec extends MockMvcSpecification {
         )
 
         then:
-        1 * cacheService.getOrganisasjonselementByOrganisasjonsId('rogfk.no', '123') >> [FintResource.with(new Organisasjonselement(organisasjonsId: new Identifikator(identifikatorverdi: '123')))]
+        1 * cacheService.getOrganisasjonselementByOrganisasjonsId('rogfk.no', '123') >> Optional.of(new OrganisasjonselementResource(organisasjonsId: new Identifikator(identifikatorverdi: '123')))
         response.andExpect(status().isOk())
     }
 
@@ -75,7 +75,7 @@ class OrganisasjonselementControllerSpec extends MockMvcSpecification {
         )
 
         then:
-        1 * cacheService.getOrganisasjonselementByOrganisasjonsKode('rogfk.no', 'abc') >> [FintResource.with(new Organisasjonselement(organisasjonsKode: new Identifikator(identifikatorverdi: 'abc')))]
+        1 * cacheService.getOrganisasjonselementByOrganisasjonsKode('rogfk.no', 'abc') >> [new OrganisasjonselementResource(organisasjonsKode: new Identifikator(identifikatorverdi: 'abc')) ]
         response.andExpect(status().isOk())
     }
 
@@ -87,7 +87,7 @@ class OrganisasjonselementControllerSpec extends MockMvcSpecification {
         )
 
         then:
-        1 * cacheService.getOrganisasjonselementByOrganisasjonsnummer('rogfk.no', '123456789') >> [FintResource.with(new Organisasjonselement(organisasjonsKode: new Identifikator(identifikatorverdi: 'abc')))]
+        1 * cacheService.getOrganisasjonselementByOrganisasjonsnummer('rogfk.no', '123456789') >> [new OrganisasjonselementResource(organisasjonsKode: new Identifikator(identifikatorverdi: 'abc'))]
         response.andExpect(status().isOk())
     }
 }
