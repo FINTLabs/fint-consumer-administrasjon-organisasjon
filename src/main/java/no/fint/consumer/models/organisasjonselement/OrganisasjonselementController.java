@@ -1,30 +1,46 @@
 package no.fint.consumer.models.organisasjonselement;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.ImmutableMap;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+
 import no.fint.audit.FintAuditService;
+
 import no.fint.consumer.config.Constants;
 import no.fint.consumer.config.ConsumerProps;
+import no.fint.consumer.event.ConsumerEventUtil;
+import no.fint.consumer.exceptions.*;
+import no.fint.consumer.status.StatusCache;
 import no.fint.consumer.utils.RestEndpoints;
-import no.fint.event.model.Event;
-import no.fint.event.model.HeaderConstants;
-import no.fint.event.model.Status;
 
-import no.fint.model.relation.FintResource;
+import no.fint.event.model.*;
+
 import no.fint.relations.FintRelationsMediaType;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.UnknownHostException;
+import java.net.URI;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
+import javax.naming.NameNotFoundException;
+
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources;
 import no.fint.model.administrasjon.organisasjon.OrganisasjonActions;
 
 @Slf4j
+@Api(tags = {"Organisasjonselement"})
 @CrossOrigin
 @RestController
 @RequestMapping(name = "Organisasjonselement", value = RestEndpoints.ORGANISASJONSELEMENT, produces = {FintRelationsMediaType.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
@@ -37,10 +53,19 @@ public class OrganisasjonselementController {
     private FintAuditService fintAuditService;
 
     @Autowired
-    private OrganisasjonselementAssembler assembler;
+    private OrganisasjonselementLinker linker;
 
     @Autowired
     private ConsumerProps props;
+
+    @Autowired
+    private StatusCache statusCache;
+
+    @Autowired
+    private ConsumerEventUtil consumerEventUtil;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @GetMapping("/last-updated")
     public Map<String, String> getLastUpdated(@RequestHeader(name = HeaderConstants.ORG_ID, required = false) String orgId) {
@@ -68,7 +93,7 @@ public class OrganisasjonselementController {
     }
 
     @GetMapping
-    public ResponseEntity getOrganisasjonselement(
+    public OrganisasjonselementResources getOrganisasjonselement(
             @RequestHeader(name = HeaderConstants.ORG_ID, required = false) String orgId,
             @RequestHeader(name = HeaderConstants.CLIENT, required = false) String client,
             @RequestParam(required = false) Long sinceTimeStamp) {
@@ -78,14 +103,14 @@ public class OrganisasjonselementController {
         if (client == null) {
             client = props.getDefaultClient();
         }
-        log.info("OrgId: {}, Client: {}", orgId, client);
+        log.debug("OrgId: {}, Client: {}", orgId, client);
 
         Event event = new Event(orgId, Constants.COMPONENT, OrganisasjonActions.GET_ALL_ORGANISASJONSELEMENT, client);
         fintAuditService.audit(event);
 
         fintAuditService.audit(event, Status.CACHE);
 
-        List<FintResource<Organisasjonselement>> organisasjonselement;
+        List<OrganisasjonselementResource> organisasjonselement;
         if (sinceTimeStamp == null) {
             organisasjonselement = cacheService.getAll(orgId);
         } else {
@@ -94,12 +119,13 @@ public class OrganisasjonselementController {
 
         fintAuditService.audit(event, Status.CACHE_RESPONSE, Status.SENT_TO_CLIENT);
 
-        return assembler.resources(organisasjonselement);
+        return linker.toResources(organisasjonselement);
     }
 
 
-    @GetMapping("/organisasjonsid/{id}")
-    public ResponseEntity getOrganisasjonselementByOrganisasjonsId(@PathVariable String id,
+    @GetMapping("/organisasjonsid/{id:.+}")
+    public OrganisasjonselementResource getOrganisasjonselementByOrganisasjonsId(
+            @PathVariable String id,
             @RequestHeader(name = HeaderConstants.ORG_ID, required = false) String orgId,
             @RequestHeader(name = HeaderConstants.CLIENT, required = false) String client) {
         if (props.isOverrideOrgId() || orgId == null) {
@@ -108,26 +134,24 @@ public class OrganisasjonselementController {
         if (client == null) {
             client = props.getDefaultClient();
         }
-        log.info("OrganisasjonsId: {}, OrgId: {}, Client: {}", id, orgId, client);
+        log.debug("OrganisasjonsId: {}, OrgId: {}, Client: {}", id, orgId, client);
 
         Event event = new Event(orgId, Constants.COMPONENT, OrganisasjonActions.GET_ORGANISASJONSELEMENT, client);
+        event.setQuery("organisasjonsid/" + id);
         fintAuditService.audit(event);
 
         fintAuditService.audit(event, Status.CACHE);
 
-        Optional<FintResource<Organisasjonselement>> organisasjonselement = cacheService.getOrganisasjonselementByOrganisasjonsId(orgId, id);
+        Optional<OrganisasjonselementResource> organisasjonselement = cacheService.getOrganisasjonselementByOrganisasjonsId(orgId, id);
 
         fintAuditService.audit(event, Status.CACHE_RESPONSE, Status.SENT_TO_CLIENT);
 
-        if (organisasjonselement.isPresent()) {
-            return assembler.resource(organisasjonselement.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return organisasjonselement.map(linker::toResource).orElseThrow(() -> new EntityNotFoundException(id));
     }
 
-    @GetMapping("/organisasjonskode/{id}")
-    public ResponseEntity getOrganisasjonselementByOrganisasjonsKode(@PathVariable String id,
+    @GetMapping("/organisasjonskode/{id:.+}")
+    public OrganisasjonselementResource getOrganisasjonselementByOrganisasjonsKode(
+            @PathVariable String id,
             @RequestHeader(name = HeaderConstants.ORG_ID, required = false) String orgId,
             @RequestHeader(name = HeaderConstants.CLIENT, required = false) String client) {
         if (props.isOverrideOrgId() || orgId == null) {
@@ -136,26 +160,24 @@ public class OrganisasjonselementController {
         if (client == null) {
             client = props.getDefaultClient();
         }
-        log.info("OrganisasjonsKode: {}, OrgId: {}, Client: {}", id, orgId, client);
+        log.debug("OrganisasjonsKode: {}, OrgId: {}, Client: {}", id, orgId, client);
 
         Event event = new Event(orgId, Constants.COMPONENT, OrganisasjonActions.GET_ORGANISASJONSELEMENT, client);
+        event.setQuery("organisasjonskode/" + id);
         fintAuditService.audit(event);
 
         fintAuditService.audit(event, Status.CACHE);
 
-        Optional<FintResource<Organisasjonselement>> organisasjonselement = cacheService.getOrganisasjonselementByOrganisasjonsKode(orgId, id);
+        Optional<OrganisasjonselementResource> organisasjonselement = cacheService.getOrganisasjonselementByOrganisasjonsKode(orgId, id);
 
         fintAuditService.audit(event, Status.CACHE_RESPONSE, Status.SENT_TO_CLIENT);
 
-        if (organisasjonselement.isPresent()) {
-            return assembler.resource(organisasjonselement.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return organisasjonselement.map(linker::toResource).orElseThrow(() -> new EntityNotFoundException(id));
     }
 
-    @GetMapping("/organisasjonsnummer/{id}")
-    public ResponseEntity getOrganisasjonselementByOrganisasjonsnummer(@PathVariable String id,
+    @GetMapping("/organisasjonsnummer/{id:.+}")
+    public OrganisasjonselementResource getOrganisasjonselementByOrganisasjonsnummer(
+            @PathVariable String id,
             @RequestHeader(name = HeaderConstants.ORG_ID, required = false) String orgId,
             @RequestHeader(name = HeaderConstants.CLIENT, required = false) String client) {
         if (props.isOverrideOrgId() || orgId == null) {
@@ -164,24 +186,56 @@ public class OrganisasjonselementController {
         if (client == null) {
             client = props.getDefaultClient();
         }
-        log.info("Organisasjonsnummer: {}, OrgId: {}, Client: {}", id, orgId, client);
+        log.debug("Organisasjonsnummer: {}, OrgId: {}, Client: {}", id, orgId, client);
 
         Event event = new Event(orgId, Constants.COMPONENT, OrganisasjonActions.GET_ORGANISASJONSELEMENT, client);
+        event.setQuery("organisasjonsnummer/" + id);
         fintAuditService.audit(event);
 
         fintAuditService.audit(event, Status.CACHE);
 
-        Optional<FintResource<Organisasjonselement>> organisasjonselement = cacheService.getOrganisasjonselementByOrganisasjonsnummer(orgId, id);
+        Optional<OrganisasjonselementResource> organisasjonselement = cacheService.getOrganisasjonselementByOrganisasjonsnummer(orgId, id);
 
         fintAuditService.audit(event, Status.CACHE_RESPONSE, Status.SENT_TO_CLIENT);
 
-        if (organisasjonselement.isPresent()) {
-            return assembler.resource(organisasjonselement.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return organisasjonselement.map(linker::toResource).orElseThrow(() -> new EntityNotFoundException(id));
     }
 
-    
+
+
+
+    //
+    // Exception handlers
+    //
+    @ExceptionHandler(UpdateEntityMismatchException.class)
+    public ResponseEntity handleUpdateEntityMismatch(Exception e) {
+        return ResponseEntity.badRequest().body(e);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity handleEntityNotFound(Exception e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
+    }
+
+    @ExceptionHandler(CreateEntityMismatchException.class)
+    public ResponseEntity handleCreateEntityMismatch(Exception e) {
+        return ResponseEntity.badRequest().body(e);
+    }
+
+    @ExceptionHandler(EntityFoundException.class)
+    public ResponseEntity handleEntityFound(Exception e) {
+        return ResponseEntity.status(HttpStatus.FOUND).body(e);
+    }
+
+    @ExceptionHandler(NameNotFoundException.class)
+    public ResponseEntity handleNameNotFound(Exception e) {
+        return ResponseEntity.badRequest().body(e);
+    }
+
+    @ExceptionHandler(UnknownHostException.class)
+    public ResponseEntity handleUnkownHost(Exception e) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e);
+    }
+
 }
 

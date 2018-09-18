@@ -2,14 +2,14 @@ package no.fint.consumer.organisasjonselement
 
 import no.fint.consumer.config.FintTestConfiguration
 import no.fint.consumer.models.organisasjonselement.OrganisasjonselementCacheService
-import no.fint.model.administrasjon.organisasjon.Organisasjonselement
+import no.fint.consumer.models.organisasjonselement.OrganisasjonselementLinker
 import no.fint.model.felles.kompleksedatatyper.Identifikator
-import no.fint.model.relation.FintResource
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
-@ContextConfiguration(classes=[FintTestConfiguration.class, OrganisasjonselementCacheService.class])
+@ContextConfiguration(classes=[FintTestConfiguration, OrganisasjonselementLinker, OrganisasjonselementCacheService])
 class OrganisasjonselementCacheServiceSpec extends Specification {
 
     @Autowired
@@ -21,11 +21,11 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
 
     def "Get Organisasjon by Organisasjonsnummer"() {
         given:
-        cacheService.createCache("mock.no").add([FintResource.with(new Organisasjonselement(
+        cacheService.createCache("mock.no").add([new OrganisasjonselementResource(
                 organisasjonsId: new Identifikator(identifikatorverdi: "12345"),
                 organisasjonsKode: new Identifikator(identifikatorverdi: "ABCD"),
                 organisasjonsnummer: new Identifikator(identifikatorverdi: "123456789"),
-                organisasjonsnavn: "TEST AS"))])
+                organisasjonsnavn: "TEST AS")])
 
         when:
         def result = cacheService.getOrganisasjonselementByOrganisasjonsnummer("mock.no", "123456789")
@@ -33,15 +33,15 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
         then:
         result
         result.isPresent()
-        result.get().getResource().organisasjonsnummer.identifikatorverdi == "123456789"
+        result.get().organisasjonsnummer.identifikatorverdi == "123456789"
     }
 
     def "Get Organisation, null Organisasjonsnummer"() {
         given:
-        cacheService.createCache("mock.no").add([FintResource.with(new Organisasjonselement(
+        cacheService.createCache("mock.no").add([new OrganisasjonselementResource(
                 organisasjonsId: new Identifikator(identifikatorverdi: "12345"),
                 organisasjonsKode: new Identifikator(identifikatorverdi: "ABCD"),
-                organisasjonsnavn: "TEST AS"))])
+                organisasjonsnavn: "TEST AS")])
 
         when:
         def result = cacheService.getOrganisasjonselementByOrganisasjonsnummer("mock.no", "123456789")
@@ -53,11 +53,11 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
 
     def "Get Organisation by Id"() {
         given:
-        cacheService.createCache("mock.no").add([FintResource.with(new Organisasjonselement(
+        cacheService.createCache("mock.no").add([new OrganisasjonselementResource(
                 organisasjonsId: new Identifikator(identifikatorverdi: "12345"),
                 organisasjonsKode: new Identifikator(identifikatorverdi: "ABCD"),
                 organisasjonsnummer: new Identifikator(identifikatorverdi: "123456789"),
-                organisasjonsnavn: "TEST AS"))])
+                organisasjonsnavn: "TEST AS")])
 
         when:
         def result = cacheService.getOrganisasjonselementByOrganisasjonsId("mock.no", "12345")
@@ -65,16 +65,16 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
         then:
         result
         result.isPresent()
-        result.get().getResource().organisasjonsnummer.identifikatorverdi == "123456789"
+        result.get().organisasjonsnummer.identifikatorverdi == "123456789"
     }
 
     def "Get Organisation by Kode"() {
         given:
-        cacheService.createCache("mock.no").add([FintResource.with(new Organisasjonselement(
+        cacheService.createCache("mock.no").add([new OrganisasjonselementResource(
                 organisasjonsId: new Identifikator(identifikatorverdi: "12345"),
                 organisasjonsKode: new Identifikator(identifikatorverdi: "ABCD"),
                 organisasjonsnummer: new Identifikator(identifikatorverdi: "123456789"),
-                organisasjonsnavn: "TEST AS"))])
+                organisasjonsnavn: "TEST AS")])
 
         when:
         def result = cacheService.getOrganisasjonselementByOrganisasjonsKode("mock.no", "ABCD")
@@ -82,7 +82,7 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
         then:
         result
         result.isPresent()
-        result.get().getResource().organisasjonsnummer.identifikatorverdi == "123456789"
+        result.get().organisasjonsnummer.identifikatorverdi == "123456789"
     }
 
     def "Organisation Not Created"() {
@@ -96,11 +96,11 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
 
     def "Organisation Not Found By Kode"() {
         given:
-        cacheService.createCache("mock.no").add([FintResource.with(new Organisasjonselement(
+        cacheService.createCache("mock.no").add([new OrganisasjonselementResource(
                 organisasjonsId: new Identifikator(identifikatorverdi: "12345"),
                 organisasjonsKode: new Identifikator(identifikatorverdi: "ABCD"),
                 organisasjonsnummer: new Identifikator(identifikatorverdi: "123456789"),
-                organisasjonsnavn: "TEST AS"))])
+                organisasjonsnavn: "TEST AS")])
 
         when:
         def result = cacheService.getOrganisasjonselementByOrganisasjonsKode("mock.no", "XYZZY")
@@ -112,11 +112,11 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
 
     def "Organisation Not Found By Id"() {
         given:
-        cacheService.createCache("mock.no").add([FintResource.with(new Organisasjonselement(
+        cacheService.createCache("mock.no").add([new OrganisasjonselementResource(
                 organisasjonsId: new Identifikator(identifikatorverdi: "12345"),
                 organisasjonsKode: new Identifikator(identifikatorverdi: "ABCD"),
                 organisasjonsnummer: new Identifikator(identifikatorverdi: "123456789"),
-                organisasjonsnavn: "TEST AS"))])
+                organisasjonsnavn: "TEST AS")])
 
         when:
         def result = cacheService.getOrganisasjonselementByOrganisasjonsId("mock.no", "33333")
@@ -128,11 +128,11 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
 
     def "Organisation Not Found By Nummer"() {
         given:
-        cacheService.createCache("mock.no").add([FintResource.with(new Organisasjonselement(
+        cacheService.createCache("mock.no").add([new OrganisasjonselementResource(
                 organisasjonsId: new Identifikator(identifikatorverdi: "12345"),
                 organisasjonsKode: new Identifikator(identifikatorverdi: "ABCD"),
                 organisasjonsnummer: new Identifikator(identifikatorverdi: "123456789"),
-                organisasjonsnavn: "TEST AS"))])
+                organisasjonsnavn: "TEST AS")])
 
         when:
         def result = cacheService.getOrganisasjonselementByOrganisasjonsnummer("mock.no", "987654321")
@@ -144,11 +144,11 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
 
     def "Wrong Org Id"() {
         given:
-        cacheService.createCache("mock.no").add([FintResource.with(new Organisasjonselement(
+        cacheService.createCache("mock.no").add([new OrganisasjonselementResource(
                 organisasjonsId: new Identifikator(identifikatorverdi: "12345"),
                 organisasjonsKode: new Identifikator(identifikatorverdi: "ABCD"),
                 organisasjonsnummer: new Identifikator(identifikatorverdi: "123456789"),
-                organisasjonsnavn: "TEST AS"))])
+                organisasjonsnavn: "TEST AS")])
 
         when:
         def result = cacheService.getOrganisasjonselementByOrganisasjonsnummer("fake.no", "123456789")
