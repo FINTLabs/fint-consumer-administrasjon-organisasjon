@@ -1,13 +1,18 @@
 package no.fint.consumer.config;
 
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Component
 public class ConsumerProps {
-    
+
     @Value("${fint.consumer.override-org-id:false}")
     private boolean overrideOrgId;
 
@@ -16,13 +21,17 @@ public class ConsumerProps {
 
     @Value("${fint.consumer.default-org-id:fint.no}")
     private String defaultOrgId;
-    
-    @Value("${fint.events.orgIds:fint.no}")
-    private String[] orgs;
 
-    
-    public static final String CACHE_INITIALDELAY_ORGANISASJONSELEMENT = "${fint.consumer.cache.initialDelay.organisasjonselement:60000}";
-    public static final String CACHE_FIXEDRATE_ORGANISASJONSELEMENT = "${fint.consumer.cache.fixedRate.organisasjonselement:900000}";
-    
+    private Set<String> assets;
+
+    @Autowired
+    private void setupOrgs(@Value("${fint.events.orgIds:}") String[] orgs) {
+        assets = new HashSet<>(Arrays.asList(orgs));
+    }
+
+    public String[] getOrgs() {
+        return assets.toArray(new String[0]);
+    }
 
 }
+
