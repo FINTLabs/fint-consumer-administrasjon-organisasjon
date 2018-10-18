@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 
+import static java.util.Objects.isNull;
+import static org.springframework.util.StringUtils.isEmpty;
+
+
 @Component
 public class OrganisasjonselementLinker extends FintLinker<OrganisasjonselementResource> {
 
@@ -29,13 +33,13 @@ public class OrganisasjonselementLinker extends FintLinker<OrganisasjonselementR
 
     @Override
     public String getSelfHref(OrganisasjonselementResource organisasjonselement) {
-        if (organisasjonselement.getOrganisasjonsId() != null && organisasjonselement.getOrganisasjonsId().getIdentifikatorverdi() != null) {
+        if (!isNull(organisasjonselement.getOrganisasjonsId()) && !isEmpty(organisasjonselement.getOrganisasjonsId().getIdentifikatorverdi())) {
             return createHrefWithId(organisasjonselement.getOrganisasjonsId().getIdentifikatorverdi(), "organisasjonsid");
         }
-        if (organisasjonselement.getOrganisasjonsKode() != null && organisasjonselement.getOrganisasjonsKode().getIdentifikatorverdi() != null) {
+        if (!isNull(organisasjonselement.getOrganisasjonsKode()) && !isEmpty(organisasjonselement.getOrganisasjonsKode().getIdentifikatorverdi())) {
             return createHrefWithId(organisasjonselement.getOrganisasjonsKode().getIdentifikatorverdi(), "organisasjonskode");
         }
-        if (organisasjonselement.getOrganisasjonsnummer() != null && organisasjonselement.getOrganisasjonsnummer().getIdentifikatorverdi() != null) {
+        if (!isNull(organisasjonselement.getOrganisasjonsnummer()) && !isEmpty(organisasjonselement.getOrganisasjonsnummer().getIdentifikatorverdi())) {
             return createHrefWithId(organisasjonselement.getOrganisasjonsnummer().getIdentifikatorverdi(), "organisasjonsnummer");
         }
         
