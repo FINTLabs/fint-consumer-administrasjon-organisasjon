@@ -3,12 +3,10 @@ package no.fint.consumer.event;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.audit.FintAuditService;
 import no.fint.cache.CacheService;
+import no.fint.consumer.config.Constants;
 import no.fint.consumer.config.ConsumerProps;
 import no.fint.consumer.status.StatusCache;
-import no.fint.event.model.Event;
-import no.fint.event.model.Operation;
-import no.fint.event.model.ResponseStatus;
-import no.fint.event.model.Status;
+import no.fint.event.model.*;
 import no.fint.events.FintEventListener;
 import no.fint.events.FintEvents;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -48,6 +46,8 @@ public class EventListener implements FintEventListener {
     		fintEvents.registerUpstreamListener(orgId, this);
     	}
     	log.info("Upstream listeners registered.");
+        Event event = new Event("", Constants.COMPONENT, DefaultActions.REGISTER_ORG_ID, Constants.COMPONENT_CONSUMER);
+        fintEvents.sendDownstream(event);
     }
 
 	@Override
