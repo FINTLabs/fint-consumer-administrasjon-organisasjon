@@ -31,7 +31,7 @@ spec:
         - {name: fint.hazelcast.kubernetes.labelValue, value: administrasjon-organisasjon}
         - {name: fint.relations.default-base-url, value: 'https://beta.felleskomponent.no'}
         - {name: server.context-path, value: /administrasjon/organisasjon}
-        image: fintlabs.azurecr.io/consumer-organisasjon:PR-2.2
+        image: fintlabs.azurecr.io/consumer-organisasjon:PR-2.4
         name: consumer-administrasjon-organisasjon
         ports:
         - {containerPort: 8080}
@@ -40,7 +40,7 @@ spec:
           initialDelaySeconds: 60
           timeoutSeconds: 5
         resources:
-          limits: {memory: 2Gi, cpu: 1500m}
+          limits: {memory: 2Gi, cpu: 750m}
       restartPolicy: Always
 ---
 apiVersion: apps/v1
