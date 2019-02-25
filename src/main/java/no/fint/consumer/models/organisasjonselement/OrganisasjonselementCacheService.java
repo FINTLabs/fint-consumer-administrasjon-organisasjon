@@ -75,7 +75,8 @@ public class OrganisasjonselementCacheService extends CacheService<Organisasjons
 		populateCache(orgId);
 	}
 
-    private void populateCache(String orgId) {
+	@Override
+    public void populateCache(String orgId) {
 		log.info("Populating Organisasjonselement cache for {}", orgId);
         Event event = new Event(orgId, Constants.COMPONENT, OrganisasjonActions.GET_ALL_ORGANISASJONSELEMENT, Constants.CACHE_SERVICE);
         consumerEventUtil.send(event);
