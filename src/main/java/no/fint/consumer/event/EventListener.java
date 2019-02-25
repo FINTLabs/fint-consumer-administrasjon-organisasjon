@@ -49,7 +49,7 @@ public class EventListener implements FintEventListener {
         log.info("Upstream listeners registered.");
     }
 
-    @Scheduled(initialDelayString = "${fint.consumer.register-delay:70000}")
+    @Scheduled(initialDelayString = "${fint.consumer.register-delay:70000}", fixedDelay = Long.MAX_VALUE)
     public void registerOrgIds() {
         Event event = new Event("", Constants.COMPONENT, DefaultActions.REGISTER_ORG_ID, Constants.COMPONENT_CONSUMER);
         fintEvents.sendDownstream(event);
