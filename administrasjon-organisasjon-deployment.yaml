@@ -17,8 +17,7 @@ spec:
       containers:
       - env:
         - {name: TZ, value: Europe/Oslo}
-        - {name: JAVA_TOOL_OPTIONS, value: '-XX:+ExitOnOutOfMemoryError -Xmx1536m
-            -verbose:gc'}
+        - {name: JAVA_TOOL_OPTIONS, value: '-XX:+ExitOnOutOfMemoryError -Xmx2G -verbose:gc'}
         - {name: fint.audit.mongo.databasename, value: fint-audit-beta}
         - name: fint.audit.mongo.connection-string
           valueFrom:
@@ -31,7 +30,7 @@ spec:
         - {name: fint.hazelcast.kubernetes.labelValue, value: administrasjon-organisasjon}
         - {name: fint.relations.default-base-url, value: 'https://beta.felleskomponent.no'}
         - {name: server.context-path, value: /administrasjon/organisasjon}
-        image: fintlabs.azurecr.io/consumer-organisasjon:PR-2.4
+        image: fintlabs.azurecr.io/consumer-organisasjon:build.4
         name: consumer-administrasjon-organisasjon
         ports:
         - {containerPort: 8080}
@@ -40,7 +39,8 @@ spec:
           initialDelaySeconds: 60
           timeoutSeconds: 5
         resources:
-          limits: {memory: 2Gi, cpu: 750m}
+          limits: {memory: 3Gi, cpu: '2'}
+          requests: {memory: 2Gi, cpu: 250m}
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -62,8 +62,7 @@ spec:
       containers:
       - env:
         - {name: TZ, value: Europe/Oslo}
-        - {name: JAVA_TOOL_OPTIONS, value: '-XX:+ExitOnOutOfMemoryError -Xmx1536m
-            -verbose:gc'}
+        - {name: JAVA_TOOL_OPTIONS, value: '-XX:+ExitOnOutOfMemoryError -Xmx2G -verbose:gc'}
         - {name: fint.audit.mongo.databasename, value: fint-audit-beta}
         - name: fint.audit.mongo.connection-string
           valueFrom:
@@ -73,10 +72,10 @@ spec:
         - {name: fint.hazelcast.kubernetes.namespace, value: default}
         - {name: fint.hazelcast.kubernetes.labelName, value: fint.stack}
         - {name: fint.hazelcast.kubernetes.labelValue, value: administrasjon-organisasjon}
-        - {name: fint.provider.assets.endpoint, value: 'https://admin-beta.fintlabs.no/api/components/assets/administrasjon_organisasjon'}
+        - {name: fint.provider.assets.endpoint, value: 'https://admin.fintlabs.no/api/components/assets/administrasjon_organisasjon'}
         - {name: fint.provider.max-number-of-emitters, value: '5'}
         - {name: server.context-path, value: /administrasjon/organisasjon/provider}
-        image: fintlabs.azurecr.io/provider:PR-25.17
+        image: fintlabs.azurecr.io/provider:build.7
         name: provider-administrasjon-organisasjon
         ports:
         - {containerPort: 8080}
@@ -85,5 +84,6 @@ spec:
           initialDelaySeconds: 60
           timeoutSeconds: 5
         resources:
-          limits: {memory: 2Gi, cpu: 500m}
+          limits: {memory: 3Gi, cpu: '2'}
+          requests: {memory: 2Gi, cpu: 250m}
       restartPolicy: Always
