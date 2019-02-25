@@ -58,7 +58,10 @@ public class EventListener implements FintEventListener {
             if (props.getAssets().add(event.getOrgId())) {
                 log.info("Registering orgId {} for {}", event.getOrgId(), event.getClient());
                 fintEvents.registerUpstreamListener(event.getOrgId(), this);
-                cacheServices.forEach(c -> c.createCache(event.getOrgId()));
+                cacheServices.forEach(c -> {
+                    c.createCache(event.getOrgId());
+                    c.populateCache(event.getOrgId());
+                });
             }
             return;
         } else if (event.isHealthCheck()) {
