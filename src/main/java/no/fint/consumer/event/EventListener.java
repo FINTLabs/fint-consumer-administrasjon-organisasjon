@@ -11,6 +11,7 @@ import no.fint.events.FintEventListener;
 import no.fint.events.FintEvents;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -24,9 +25,9 @@ public class EventListener implements FintEventListener {
 
     @Autowired(required = false)
     private List<CacheService> cacheServices;
-    
-	@Autowired
-	private FintEvents fintEvents;
+
+    @Autowired
+    private FintEvents fintEvents;
 
     @Autowired
     private FintAuditService fintAuditService;
@@ -42,16 +43,20 @@ public class EventListener implements FintEventListener {
         fintEvents.registerUpstreamSystemListener(this);
         if (cacheServices == null)
             cacheServices = Collections.emptyList();
-    	for (String orgId : props.getAssets()) {
-    		fintEvents.registerUpstreamListener(orgId, this);
-    	}
-    	log.info("Upstream listeners registered.");
+        for (String orgId : props.getAssets()) {
+            fintEvents.registerUpstreamListener(orgId, this);
+        }
+        log.info("Upstream listeners registered.");
+    }
+
+    @Scheduled(initialDelayString = "${fint.consumer.register-delay:70000}")
+    public void registerOrgIds() {
         Event event = new Event("", Constants.COMPONENT, DefaultActions.REGISTER_ORG_ID, Constants.COMPONENT_CONSUMER);
         fintEvents.sendDownstream(event);
     }
 
-	@Override
-	public void accept(Event event) {
+    @Override
+    public void accept(Event event) {
         log.debug("Received event: {}", event);
         log.trace("Event data: {}", event.getData());
         if (event.isRegisterOrgId()) {
@@ -96,5 +101,5 @@ public class EventListener implements FintEventListener {
             log.warn("Unhandled event: {}", event);
         }
     }
-	
+
 }
