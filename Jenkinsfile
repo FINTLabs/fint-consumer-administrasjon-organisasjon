@@ -5,7 +5,6 @@ pipeline {
             steps {
                 script {
                     props=readProperties file: 'gradle.properties'
-                    VERSION="${props.version}-${props.apiVersion}"
                 }
                 sh "docker build --tag ${GIT_COMMIT} --build-arg apiVersion=${props.apiVersion} ."
             }
