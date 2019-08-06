@@ -51,6 +51,7 @@ public class EventListener implements FintEventListener {
 
     @Scheduled(initialDelayString = "${fint.consumer.register-delay:70000}", fixedDelay = Long.MAX_VALUE)
     public void registerOrgIds() {
+        log.info("Bootstrapping orgId registration ...");
         Event event = new Event("", Constants.COMPONENT, DefaultActions.REGISTER_ORG_ID, Constants.COMPONENT_CONSUMER);
         fintEvents.sendDownstream(event);
     }
