@@ -54,7 +54,8 @@ spec:
         - {name: fint.hazelcast.kubernetes.labelValue, value: administrasjon-organisasjon}
         - {name: fint.relations.default-base-url, value: 'https://beta.felleskomponent.no'}
         - {name: server.context-path, value: /administrasjon/organisasjon}
-        image: fintlabs.azurecr.io/consumer-organisasjon:3.3.0
+        - {name: spring.mvc.logResolvedException,  value: 'false'}
+        image: fintlabs.azurecr.io/consumer-organisasjon:PR-3.2
         name: consumer-administrasjon-organisasjon
         ports:
         - {containerPort: 8080}
