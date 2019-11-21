@@ -7,7 +7,7 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - {name: '8080', port: 8080}
+    - {name: '8080', port: 8080}
   selector: {fint.stack: administrasjon-organisasjon, fint.role: consumer}
 ---
 apiVersion: v1
@@ -19,7 +19,7 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - {name: '8080', port: 8080}
+    - {name: '8080', port: 8080}
   selector: {fint.stack: administrasjon-organisasjon, fint.role: provider}
 ---
 apiVersion: apps/v1
@@ -39,34 +39,38 @@ spec:
       labels: {fint.stack: administrasjon-organisasjon, fint.role: consumer}
     spec:
       containers:
-      - env:
-        - {name: TZ, value: Europe/Oslo}
-        - {name: JAVA_TOOL_OPTIONS, value: '-XX:+ExitOnOutOfMemoryError -Xmx2G -verbose:gc'}
-        - {name: fint.audit.mongo.databasename, value: fint-audit-beta}
-        - {name: fint.audit.mongo.collection, value: auditEvents}
-        - name: fint.audit.mongo.connection-string
-          valueFrom:
-            secretKeyRef: {key: mongodb, name: fint-audit}
-        - {name: fint.cache.manager, value: default}
-        - {name: fint.events.orgIds, value: health.fintlabs.no}
-        - {name: fint.hazelcast.kubernetes.enabled, value: 'true'}
-        - {name: fint.hazelcast.kubernetes.namespace, value: default}
-        - {name: fint.hazelcast.kubernetes.labelName, value: fint.stack}
-        - {name: fint.hazelcast.kubernetes.labelValue, value: administrasjon-organisasjon}
-        - {name: fint.relations.default-base-url, value: 'https://beta.felleskomponent.no'}
-        - {name: server.context-path, value: /administrasjon/organisasjon}
-        - {name: spring.mvc.logResolvedException,  value: 'false'}
-        image: fintlabs.azurecr.io/consumer-organisasjon:PR-4.1
-        name: consumer-administrasjon-organisasjon
-        ports:
-        - {containerPort: 8080}
-        readinessProbe:
-          httpGet: {path: /administrasjon/organisasjon/health, port: 8080}
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-        resources:
-          limits: {memory: 3Gi, cpu: '2'}
-          requests: {memory: 2Gi, cpu: 250m}
+        - env:
+            - {name: TZ, value: Europe/Oslo}
+            - {name: JAVA_TOOL_OPTIONS, value: '-XX:+ExitOnOutOfMemoryError -Xmx2G -verbose:gc'}
+            - {name: fint.audit.mongo.databasename, value: fint-audit-beta}
+            - name: fint.audit.mongo.connection-string
+              valueFrom:
+                secretKeyRef: {key: mongodb, name: fint-audit}
+            - {name: fint.audit.mongo.collection, value: auditEvents}
+            - {name: fint.audit.mongo.buffer-size, value: '125000'}
+            - {name: fint.audit.mongo.rate, value: '1000'}
+            - {name: fint.cache.manager, value: default}
+            - {name: fint.events.orgIds, value: health.fintlabs.no}
+            - {name: fint.hazelcast.kubernetes.enabled, value: 'true'}
+            - {name: fint.hazelcast.kubernetes.namespace, value: default}
+            - {name: fint.hazelcast.kubernetes.labelName, value: fint.stack}
+            - {name: fint.hazelcast.kubernetes.labelValue, value: administrasjon-organisasjon}
+            - {name: fint.relations.default-base-url, value: 'https://beta.felleskomponent.no'}
+            - {name: spring.mvc.logResolvedException,  value: 'false'}
+            - {name: endpoints.sensitive, value: 'false'}
+            - {name: management.security.enabled, value: 'false'}
+            - {name: server.context-path, value: /administrasjon/organisasjon}
+          image: fintlabs.azurecr.io/consumer-administrasjon-organisasjon:3.3.1
+          name: consumer-administrasjon-organisasjon
+          ports:
+            - {containerPort: 8080}
+          readinessProbe:
+            httpGet: {path: /administrasjon/organisasjon/health, port: 8080}
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          resources:
+            limits: {memory: 3Gi, cpu: '2'}
+            requests: {memory: 2Gi, cpu: 250m}
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -86,32 +90,38 @@ spec:
       labels: {fint.stack: administrasjon-organisasjon, fint.role: provider}
     spec:
       containers:
-      - env:
-        - {name: TZ, value: Europe/Oslo}
-        - {name: JAVA_TOOL_OPTIONS, value: '-XX:+ExitOnOutOfMemoryError -Xmx4G -verbose:gc'}
-        - {name: fint.audit.mongo.databasename, value: fint-audit-beta}
-        - {name: fint.audit.mongo.collection, value: auditEvents}
-        - name: fint.audit.mongo.connection-string
-          valueFrom:
-            secretKeyRef: {key: mongodb, name: fint-audit}
-        - {name: fint.events.orgIds, value: health.fintlabs.no}
-        - {name: fint.hazelcast.kubernetes.enabled, value: 'true'}
-        - {name: fint.hazelcast.kubernetes.namespace, value: default}
-        - {name: fint.hazelcast.kubernetes.labelName, value: fint.stack}
-        - {name: fint.hazelcast.kubernetes.labelValue, value: administrasjon-organisasjon}
-        - {name: fint.provider.max-number-of-emitters, value: '5'}
-        - {name: fint.provider.sse.heartbeat.enabled, value: 'true'}
-        - {name: server.context-path, value: /administrasjon/organisasjon/provider}
-        - {name: fint.provider.assets.endpoint, value: 'https://admin.fintlabs.no/api/components/assets/administrasjon_organisasjon'}
-        image: fintlabs.azurecr.io/provider:PR-32.5
-        name: provider-administrasjon-organisasjon
-        ports:
-        - {containerPort: 8080}
-        readinessProbe:
-          httpGet: {path: /administrasjon/organisasjon/provider/health, port: 8080}
-          initialDelaySeconds: 60
-          timeoutSeconds: 30
-        resources:
-          limits: {memory: 5Gi, cpu: '2'}
-          requests: {memory: 4Gi, cpu: 250m}
+        - env:
+            - {name: TZ, value: Europe/Oslo}
+            - {name: JAVA_TOOL_OPTIONS, value: '-XX:+ExitOnOutOfMemoryError -Xmx2G -verbose:gc'}
+            - {name: fint.audit.mongo.databasename, value: fint-audit-beta}
+            - name: fint.audit.mongo.connection-string
+              valueFrom:
+                secretKeyRef: {key: mongodb, name: fint-audit}
+            - {name: fint.audit.mongo.collection, value: auditEvents}
+            - {name: fint.audit.mongo.buffer-size, value: '125000'}
+            - {name: fint.audit.mongo.rate, value: '1000'}
+            - {name: fint.events.orgIds, value: health.fintlabs.no}
+            - {name: fint.hazelcast.kubernetes.enabled, value: 'true'}
+            - {name: fint.hazelcast.kubernetes.namespace, value: default}
+            - {name: fint.hazelcast.kubernetes.labelName, value: fint.stack}
+            - {name: fint.hazelcast.kubernetes.labelValue, value: administrasjon-organisasjon}
+            - {name: fint.provider.max-number-of-emitters, value: '5'}
+            - {name: fint.provider.assets.endpoint, value: 'https://admin.fintlabs.no/api/components/assets/administrasjon_organisasjon'}
+            - {name: spring.mvc.logResolvedException,  value: 'false'}
+            - {name: endpoints.sensitive, value: 'false'}
+            - {name: management.security.enabled, value: 'false'}
+            - {name: server.tomcat.max-threads, value: '400'}
+            - {name: server.tomcat.max-connections, value: '30000'}
+            - {name: server.context-path, value: /administrasjon/organisasjon/provider}
+          image: fintlabs.azurecr.io/provider:2.2.0
+          name: provider-administrasjon-organisasjon
+          ports:
+            - {containerPort: 8080}
+          readinessProbe:
+            httpGet: {path: /administrasjon/organisasjon/provider/health, port: 8080}
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          resources:
+            limits: {memory: 3Gi, cpu: '2'}
+            requests: {memory: 2Gi, cpu: 250m}
       restartPolicy: Always
