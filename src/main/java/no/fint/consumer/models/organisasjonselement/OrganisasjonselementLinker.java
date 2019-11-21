@@ -7,6 +7,7 @@ import no.fint.relations.FintLinker;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.stream.IntStream;
 
 import static java.util.Objects.isNull;
 import static org.springframework.util.StringUtils.isEmpty;
@@ -45,6 +46,21 @@ public class OrganisasjonselementLinker extends FintLinker<OrganisasjonselementR
         
         return null;
     }
-    
+
+    int[] hashCodes(OrganisasjonselementResource organisasjonselement) {
+        IntStream.Builder builder = IntStream.builder();
+        if (!isNull(organisasjonselement.getOrganisasjonsId()) && !isEmpty(organisasjonselement.getOrganisasjonsId().getIdentifikatorverdi())) {
+            builder.add(organisasjonselement.getOrganisasjonsId().getIdentifikatorverdi().hashCode());
+        }
+        if (!isNull(organisasjonselement.getOrganisasjonsKode()) && !isEmpty(organisasjonselement.getOrganisasjonsKode().getIdentifikatorverdi())) {
+            builder.add(organisasjonselement.getOrganisasjonsKode().getIdentifikatorverdi().hashCode());
+        }
+        if (!isNull(organisasjonselement.getOrganisasjonsnummer()) && !isEmpty(organisasjonselement.getOrganisasjonsnummer().getIdentifikatorverdi())) {
+            builder.add(organisasjonselement.getOrganisasjonsnummer().getIdentifikatorverdi().hashCode());
+        }
+        
+        return builder.build().toArray();
+    }
+
 }
 
