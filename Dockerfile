@@ -8,5 +8,5 @@ FROM gcr.io/distroless/java:8
 ENV JAVA_TOOL_OPTIONS -XX:+ExitOnOutOfMemoryError
 COPY --from=builder /home/gradle/build/deps/external/*.jar /data/
 COPY --from=builder /home/gradle/build/deps/fint/*.jar /data/
-COPY --from=builder /home/gradle/build/libs/fint-consumer-organisasjon-*.jar /data/fint-consumer-organisasjon.jar
-CMD ["/data/fint-consumer-organisasjon.jar"]
+COPY --from=builder /home/gradle/build/libs/fint-consumer-administrasjon-organisasjon-*.jar /data/fint-consumer-administrasjon-organisasjon.jar
+CMD ["/data/fint-consumer-administrasjon-organisasjon.jar"]
