@@ -60,7 +60,12 @@ spec:
             - {name: endpoints.sensitive, value: 'false'}
             - {name: management.security.enabled, value: 'false'}
             - {name: server.context-path, value: /administrasjon/organisasjon}
-          image: fintlabs.azurecr.io/consumer-administrasjon-organisasjon:3.3.1
+          envFrom:
+            - configMapRef:
+                name: fint-environment
+            - secretRef:
+                name: fint-events-azure-eventhub
+          image: fintlabs.azurecr.io/consumer-administrasjon-organisasjon:build.7
           name: consumer-administrasjon-organisasjon
           ports:
             - {containerPort: 8080}
@@ -113,7 +118,12 @@ spec:
             - {name: server.tomcat.max-threads, value: '400'}
             - {name: server.tomcat.max-connections, value: '30000'}
             - {name: server.context-path, value: /administrasjon/organisasjon/provider}
-          image: fintlabs.azurecr.io/provider:2.2.0
+          envFrom:
+            - configMapRef:
+                name: fint-environment
+            - secretRef:
+                name: fint-events-azure-eventhub
+          image: fintlabs.azurecr.io/provider:2.3.0-alpha-2
           name: provider-administrasjon-organisasjon
           ports:
             - {containerPort: 8080}
