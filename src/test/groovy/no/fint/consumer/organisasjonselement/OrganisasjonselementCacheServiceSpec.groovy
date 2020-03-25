@@ -1,5 +1,6 @@
 package no.fint.consumer.organisasjonselement
 
+import no.fint.cache.exceptions.CacheNotFoundException
 import no.fint.consumer.config.FintTestConfiguration
 import no.fint.consumer.models.organisasjonselement.OrganisasjonselementCacheService
 import no.fint.consumer.models.organisasjonselement.OrganisasjonselementLinker
@@ -87,11 +88,10 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
 
     def "Organisation Not Created"() {
         when:
-        def result = cacheService.getOrganisasjonselementByOrganisasjonsnummer("mock.no", "123456789")
+        cacheService.getOrganisasjonselementByOrganisasjonsnummer("mock.no", "123456789")
 
         then:
-        result
-        !result.isPresent()
+        thrown(CacheNotFoundException)
     }
 
     def "Organisation Not Found By Kode"() {
@@ -151,11 +151,10 @@ class OrganisasjonselementCacheServiceSpec extends Specification {
                 organisasjonsnavn: "TEST AS")])
 
         when:
-        def result = cacheService.getOrganisasjonselementByOrganisasjonsnummer("fake.no", "123456789")
+        cacheService.getOrganisasjonselementByOrganisasjonsnummer("fake.no", "123456789")
 
         then:
-        result
-        !result.isPresent()
+        thrown(CacheNotFoundException)
     }
 
 }
