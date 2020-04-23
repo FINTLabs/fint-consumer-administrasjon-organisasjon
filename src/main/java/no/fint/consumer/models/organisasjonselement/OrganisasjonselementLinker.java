@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 import static org.springframework.util.StringUtils.isEmpty;
-
 
 @Component
 public class OrganisasjonselementLinker extends FintLinker<OrganisasjonselementResource> {
@@ -34,17 +34,23 @@ public class OrganisasjonselementLinker extends FintLinker<OrganisasjonselementR
 
     @Override
     public String getSelfHref(OrganisasjonselementResource organisasjonselement) {
+        return getAllSelfHrefs(organisasjonselement).findFirst().orElse(null);
+    }
+
+    @Override
+    public Stream<String> getAllSelfHrefs(OrganisasjonselementResource organisasjonselement) {
+        Stream.Builder<String> builder = Stream.builder();
         if (!isNull(organisasjonselement.getOrganisasjonsId()) && !isEmpty(organisasjonselement.getOrganisasjonsId().getIdentifikatorverdi())) {
-            return createHrefWithId(organisasjonselement.getOrganisasjonsId().getIdentifikatorverdi(), "organisasjonsid");
+            builder.add(createHrefWithId(organisasjonselement.getOrganisasjonsId().getIdentifikatorverdi(), "organisasjonsid"));
         }
         if (!isNull(organisasjonselement.getOrganisasjonsKode()) && !isEmpty(organisasjonselement.getOrganisasjonsKode().getIdentifikatorverdi())) {
-            return createHrefWithId(organisasjonselement.getOrganisasjonsKode().getIdentifikatorverdi(), "organisasjonskode");
+            builder.add(createHrefWithId(organisasjonselement.getOrganisasjonsKode().getIdentifikatorverdi(), "organisasjonskode"));
         }
         if (!isNull(organisasjonselement.getOrganisasjonsnummer()) && !isEmpty(organisasjonselement.getOrganisasjonsnummer().getIdentifikatorverdi())) {
-            return createHrefWithId(organisasjonselement.getOrganisasjonsnummer().getIdentifikatorverdi(), "organisasjonsnummer");
+            builder.add(createHrefWithId(organisasjonselement.getOrganisasjonsnummer().getIdentifikatorverdi(), "organisasjonsnummer"));
         }
         
-        return null;
+        return builder.build();
     }
 
     int[] hashCodes(OrganisasjonselementResource organisasjonselement) {
