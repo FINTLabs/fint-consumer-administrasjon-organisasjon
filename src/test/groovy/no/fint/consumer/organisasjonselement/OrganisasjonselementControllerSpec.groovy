@@ -7,13 +7,12 @@ import no.fint.consumer.models.organisasjonselement.OrganisasjonselementControll
 import no.fint.consumer.models.organisasjonselement.OrganisasjonselementLinker
 import no.fint.consumer.utils.RestEndpoints
 import no.fint.event.model.HeaderConstants
-import no.fint.model.administrasjon.organisasjon.Organisasjonselement
 import no.fint.model.felles.kompleksedatatyper.Identifikator
-import no.fint.model.relation.FintResource
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
 import no.fint.test.utils.MockMvcSpecification
-import org.springframework.http.ResponseEntity
 import org.springframework.test.web.servlet.MockMvc
+
+import java.util.stream.Stream
 
 class OrganisasjonselementControllerSpec extends MockMvcSpecification {
     private OrganisasjonselementController controller
@@ -51,7 +50,7 @@ class OrganisasjonselementControllerSpec extends MockMvcSpecification {
         )
 
         then:
-        1 * cacheService.getAll('rogfk.no') >> [new OrganisasjonselementResource(), new OrganisasjonselementResource()]
+        1 * cacheService.streamAll('rogfk.no') >> Stream.of(new OrganisasjonselementResource(), new OrganisasjonselementResource())
         response.andExpect(status().isOk())
     }
 
