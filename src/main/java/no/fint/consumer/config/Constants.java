@@ -1,4 +1,3 @@
-
 package no.fint.consumer.config;
 
 public enum Constants {
