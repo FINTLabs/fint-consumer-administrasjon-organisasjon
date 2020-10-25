@@ -2,6 +2,7 @@ package no.fint.consumer.organisasjonselement
 
 import no.fint.cache.exceptions.CacheNotFoundException
 import no.fint.consumer.config.FintTestConfiguration
+import no.fint.consumer.event.SynchronousEvents
 import no.fint.consumer.models.organisasjonselement.OrganisasjonselementCacheService
 import no.fint.consumer.models.organisasjonselement.OrganisasjonselementLinker
 import no.fint.model.felles.kompleksedatatyper.Identifikator
@@ -10,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
-@ContextConfiguration(classes=[FintTestConfiguration, OrganisasjonselementLinker, OrganisasjonselementCacheService])
+@ContextConfiguration(classes=[FintTestConfiguration, OrganisasjonselementLinker, OrganisasjonselementCacheService, SynchronousEvents])
 class OrganisasjonselementCacheServiceSpec extends Specification {
 
     @Autowired
