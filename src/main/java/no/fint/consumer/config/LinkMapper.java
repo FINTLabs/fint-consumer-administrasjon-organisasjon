@@ -3,8 +3,7 @@ package no.fint.consumer.config;
 import no.fint.consumer.utils.RestEndpoints;
 import java.util.Map;
 import com.google.common.collect.ImmutableMap;
-
-import no.fint.model.administrasjon.organisasjon.*;
+import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
 
 public class LinkMapper {
 
