@@ -182,7 +182,7 @@ public class ArbeidslokasjonController {
 
             fintAuditService.audit(response, Status.SENT_TO_CLIENT);
 
-            return linker.toResource(arbeidslokasjon);
+            return linker.mapAndResetLinks(arbeidslokasjon);
         }    
     }
 
@@ -226,7 +226,7 @@ public class ArbeidslokasjonController {
 
             fintAuditService.audit(response, Status.SENT_TO_CLIENT);
 
-            return linker.toResource(arbeidslokasjon);
+            return linker.mapAndResetLinks(arbeidslokasjon);
         }    
     }
 
