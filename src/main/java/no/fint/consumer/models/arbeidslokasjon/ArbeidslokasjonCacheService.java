@@ -117,10 +117,7 @@ public class ArbeidslokasjonCacheService extends CacheService<ArbeidslokasjonRes
         } else {
             data = objectMapper.convertValue(event.getData(), javaType);
         }
-        data.forEach(resource -> {
-            linker.mapLinks(resource);
-            linker.resetSelfLinks(resource);
-        });
+        data.forEach(linker::mapLinks);
         if (OrganisasjonActions.valueOf(event.getAction()) == OrganisasjonActions.UPDATE_ARBEIDSLOKASJON) {
             if (event.getResponseStatus() == ResponseStatus.ACCEPTED || event.getResponseStatus() == ResponseStatus.CONFLICT) {
                 List<CacheObject<ArbeidslokasjonResource>> cacheObjects = data
