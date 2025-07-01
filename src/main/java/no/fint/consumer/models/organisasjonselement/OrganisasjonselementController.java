@@ -1,14 +1,16 @@
 package no.fint.consumer.models.organisasjonselement;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import no.fint.antlr.FintFilterService;
+import org.apache.commons.lang3.StringUtils;
+
 import no.fint.audit.FintAuditService;
-import no.fint.cache.exceptions.CacheNotFoundException;
+
+import no.fint.cache.exceptions.*;
 import no.fint.consumer.config.Constants;
 import no.fint.consumer.config.ConsumerProps;
 import no.fint.consumer.event.ConsumerEventUtil;
@@ -17,15 +19,12 @@ import no.fint.consumer.exceptions.*;
 import no.fint.consumer.status.StatusCache;
 import no.fint.consumer.utils.EventResponses;
 import no.fint.consumer.utils.RestEndpoints;
-import no.fint.event.model.Event;
-import no.fint.event.model.HeaderConstants;
-import no.fint.event.model.Operation;
-import no.fint.event.model.Status;
-import no.fint.model.administrasjon.organisasjon.OrganisasjonActions;
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources;
+import no.fint.antlr.FintFilterService;
+
+import no.fint.event.model.*;
+
 import no.fint.relations.FintRelationsMediaType;
-import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,14 +33,19 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.net.URI;
+
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources;
+import no.fint.model.administrasjon.organisasjon.OrganisasjonActions;
 
 @Slf4j
 @Api(tags = {"Organisasjonselement"})
@@ -148,14 +152,14 @@ public class OrganisasjonselementController {
 
         return linker.toResources(resources, offset, size, cacheService.getCacheSize(orgId));
     }
-
+    
     @PostMapping("/$query")
     public OrganisasjonselementResources getOrganisasjonselementByQuery(
-            @RequestHeader(name = HeaderConstants.ORG_ID, required = false) String orgId,
+            @RequestHeader(name = HeaderConstants.ORG_ID, required = false)   String orgId,
             @RequestHeader(name = HeaderConstants.CLIENT, required = false) String client,
             @RequestParam(defaultValue = "0") long sinceTimeStamp,
-            @RequestParam(defaultValue = "0") int size,
-            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "0") int  size,
+            @RequestParam(defaultValue = "0") int  offset,
             @RequestBody(required = false) String query,
             HttpServletRequest request
     ) throws InterruptedException {
@@ -163,31 +167,30 @@ public class OrganisasjonselementController {
     }
 
     private OrganisasjonselementResources getOrganisasjonselementByOdataFilter(
-            String client, String orgId, String $filter
+        String client, String orgId, String $filter
     ) throws InterruptedException {
         if (!fintFilterService.validate($filter))
             throw new IllegalArgumentException("OData Filter is not valid");
-
+    
         if (props.isOverrideOrgId() || orgId == null) orgId = props.getDefaultOrgId();
         if (client == null) client = props.getDefaultClient();
-
+    
         Event event = new Event(
                 orgId, Constants.COMPONENT,
                 OrganisasjonActions.GET_ORGANISASJONSELEMENT, client);
         event.setOperation(Operation.READ);
         event.setQuery(ODATA_FILTER_QUERY_OPTION.concat($filter));
-
+    
         BlockingQueue<Event> queue = synchronousEvents.register(event);
         consumerEventUtil.send(event);
-
+    
         Event response = EventResponses.handle(queue.poll(5, TimeUnit.MINUTES));
         if (response.getData() == null || response.getData().isEmpty())
             return new OrganisasjonselementResources();
-
+    
         ArrayList<OrganisasjonselementResource> list = objectMapper.convertValue(
                 response.getData(),
-                new TypeReference<ArrayList<OrganisasjonselementResource>>() {
-                });
+                new TypeReference<ArrayList<OrganisasjonselementResource>>() {});
         fintAuditService.audit(response, Status.SENT_TO_CLIENT);
         list.forEach(r -> linker.mapAndResetLinks(r));
         return linker.toResources(list);
@@ -235,7 +238,7 @@ public class OrganisasjonselementController {
             fintAuditService.audit(response, Status.SENT_TO_CLIENT);
 
             return linker.mapAndResetLinks(organisasjonselement);
-        }
+        }    
     }
 
     @GetMapping("/organisasjonskode/{id:.+}")
@@ -279,7 +282,7 @@ public class OrganisasjonselementController {
             fintAuditService.audit(response, Status.SENT_TO_CLIENT);
 
             return linker.mapAndResetLinks(organisasjonselement);
-        }
+        }    
     }
 
     @GetMapping("/organisasjonsnummer/{id:.+}")
@@ -323,8 +326,9 @@ public class OrganisasjonselementController {
             fintAuditService.audit(response, Status.SENT_TO_CLIENT);
 
             return linker.mapAndResetLinks(organisasjonselement);
-        }
+        }    
     }
+
 
 
     // Writable class
@@ -358,7 +362,7 @@ public class OrganisasjonselementController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).location(location).build();
     }
 
-
+  
     @PutMapping("/organisasjonsid/{id:.+}")
     public ResponseEntity putOrganisasjonselementByOrganisasjonsId(
             @PathVariable String id,
@@ -382,7 +386,7 @@ public class OrganisasjonselementController {
         URI location = UriComponentsBuilder.fromUriString(linker.self()).path("status/{id}").buildAndExpand(event.getCorrId()).toUri();
         return ResponseEntity.status(HttpStatus.ACCEPTED).location(location).build();
     }
-
+  
     @PutMapping("/organisasjonskode/{id:.+}")
     public ResponseEntity putOrganisasjonselementByOrganisasjonsKode(
             @PathVariable String id,
@@ -406,7 +410,7 @@ public class OrganisasjonselementController {
         URI location = UriComponentsBuilder.fromUriString(linker.self()).path("status/{id}").buildAndExpand(event.getCorrId()).toUri();
         return ResponseEntity.status(HttpStatus.ACCEPTED).location(location).build();
     }
-
+  
     @PutMapping("/organisasjonsnummer/{id:.+}")
     public ResponseEntity putOrganisasjonselementByOrganisasjonsnummer(
             @PathVariable String id,
@@ -430,7 +434,7 @@ public class OrganisasjonselementController {
         URI location = UriComponentsBuilder.fromUriString(linker.self()).path("status/{id}").buildAndExpand(event.getCorrId()).toUri();
         return ResponseEntity.status(HttpStatus.ACCEPTED).location(location).build();
     }
-
+  
 
     //
     // Exception handlers
