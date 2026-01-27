@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import no.fint.model.administrasjon.organisasjon.Arbeidslokasjon;
-import no.fint.model.resource.administrasjon.organisasjon.ArbeidslokasjonResource;
-import no.fint.model.administrasjon.organisasjon.OrganisasjonActions;
-import no.fint.model.felles.kompleksedatatyper.Identifikator;
+import no.novari.fint.model.administrasjon.organisasjon.Arbeidslokasjon;
+import no.novari.fint.model.resource.administrasjon.organisasjon.ArbeidslokasjonResource;
+import no.novari.fint.model.administrasjon.organisasjon.OrganisasjonActions;
+import no.novari.fint.model.felles.kompleksedatatyper.Identifikator;
 
 @Slf4j
 @Service

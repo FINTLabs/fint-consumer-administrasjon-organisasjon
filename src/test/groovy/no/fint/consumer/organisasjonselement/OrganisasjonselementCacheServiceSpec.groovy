@@ -5,8 +5,8 @@ import no.fint.consumer.config.FintTestConfiguration
 import no.fint.consumer.event.SynchronousEvents
 import no.fint.consumer.models.organisasjonselement.OrganisasjonselementCacheService
 import no.fint.consumer.models.organisasjonselement.OrganisasjonselementLinker
-import no.fint.model.felles.kompleksedatatyper.Identifikator
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
+import no.novari.fint.model.felles.kompleksedatatyper.Identifikator
+import no.novari.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification

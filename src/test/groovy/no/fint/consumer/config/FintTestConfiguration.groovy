@@ -1,4 +1,4 @@
-package no.fint.consumer.config;
+package no.fint.consumer.config
 
 import no.fint.audit.FintAuditService;
 import no.fint.cache.CacheManager;
@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Bean;
 import spock.mock.DetachedMockFactory;
 import spock.mock.MockFactory;
 
-public class FintTestConfiguration {
 
+public class FintTestConfiguration {
     MockFactory mockFactory = new DetachedMockFactory();
 
     @Bean
@@ -58,5 +58,4 @@ public class FintTestConfiguration {
     ConsumerEventUtil consumerEventUtil() {
         return mockFactory.Mock(ConsumerEventUtil.class);
     }
-
 }

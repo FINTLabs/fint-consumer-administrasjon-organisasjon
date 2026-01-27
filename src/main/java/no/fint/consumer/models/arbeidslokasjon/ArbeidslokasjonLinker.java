@@ -1,7 +1,7 @@
 package no.fint.consumer.models.arbeidslokasjon;
 
-import no.fint.model.resource.administrasjon.organisasjon.ArbeidslokasjonResource;
-import no.fint.model.resource.administrasjon.organisasjon.ArbeidslokasjonResources;
+import no.novari.fint.model.resource.administrasjon.organisasjon.ArbeidslokasjonResource;
+import no.novari.fint.model.resource.administrasjon.organisasjon.ArbeidslokasjonResources;
 import no.fint.relations.FintLinker;
 import org.springframework.stereotype.Component;
 

@@ -7,9 +7,9 @@ import no.fint.consumer.models.organisasjonselement.OrganisasjonselementControll
 import no.fint.consumer.models.organisasjonselement.OrganisasjonselementLinker
 import no.fint.consumer.utils.RestEndpoints
 import no.fint.event.model.HeaderConstants
-import no.fint.model.felles.kompleksedatatyper.Identifikator
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
 import no.fint.test.utils.MockMvcSpecification
+import no.novari.fint.model.felles.kompleksedatatyper.Identifikator
+import no.novari.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
 import org.springframework.test.web.servlet.MockMvc
 
 import java.util.stream.Stream
