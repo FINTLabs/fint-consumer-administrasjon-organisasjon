@@ -43,9 +43,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import no.fint.model.resource.administrasjon.organisasjon.ArbeidslokasjonResource;
-import no.fint.model.resource.administrasjon.organisasjon.ArbeidslokasjonResources;
-import no.fint.model.administrasjon.organisasjon.OrganisasjonActions;
+import no.novari.fint.model.resource.administrasjon.organisasjon.ArbeidslokasjonResource;
+import no.novari.fint.model.resource.administrasjon.organisasjon.ArbeidslokasjonResources;
+import no.novari.fint.model.administrasjon.organisasjon.OrganisasjonActions;
 
 @Slf4j
 @Api(tags = {"Arbeidslokasjon"})
