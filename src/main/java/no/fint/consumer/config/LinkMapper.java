@@ -12,12 +12,12 @@ public class LinkMapper {
         return ImmutableMap.<String,String>builder()
             .put(Arbeidslokasjon.class.getName(), contextPath + RestEndpoints.ARBEIDSLOKASJON)
             .put(Organisasjonselement.class.getName(), contextPath + RestEndpoints.ORGANISASJONSELEMENT)
-            .put("no.novari.fint.model.felles.kodeverk.iso.Landkode", "/felles/kodeverk/iso/landkode")
-            .put("no.novari.fint.model.administrasjon.personal.Arbeidsforhold", "/administrasjon/personal/arbeidsforhold")
-            .put("no.novari.fint.model.administrasjon.kodeverk.Ansvar", "/administrasjon/kodeverk/ansvar")
-            .put("no.novari.fint.model.administrasjon.kodeverk.Organisasjonstype", "/administrasjon/kodeverk/organisasjonstype")
-            .put("no.novari.fint.model.administrasjon.personal.Personalressurs", "/administrasjon/personal/personalressurs")
-            .put("no.novari.fint.model.utdanning.utdanningsprogram.Skole", "/utdanning/utdanningsprogram/skole")
+            .put("no.novari.fint.model.felles.kodeverk.iso.Landkode", "/model/felles/kodeverk/iso/landkode")
+            .put("no.novari.fint.model.administrasjon.personal.Arbeidsforhold", "/model/administrasjon/personal/arbeidsforhold")
+            .put("no.novari.fint.model.administrasjon.kodeverk.Ansvar", "/model/administrasjon/kodeverk/ansvar")
+            .put("no.novari.fint.model.administrasjon.kodeverk.Organisasjonstype", "/model/administrasjon/kodeverk/organisasjonstype")
+            .put("no.novari.fint.model.administrasjon.personal.Personalressurs", "/model/administrasjon/personal/personalressurs")
+            .put("no.novari.fint.model.utdanning.utdanningsprogram.Skole", "/model/utdanning/utdanningsprogram/skole")
             /* .put(TODO,TODO) */
             .build();
     }
